@@ -49,7 +49,7 @@ $(function(){
     <div>
         <h4  >【问题描述】</h4>
         <hr />
-        <p>一些产品中为了美观和其他原因使用没有选中状态的标准控件通过背景颜色的改变来表示选中状态，如使用按钮（Button），这样的控件屏幕阅读器无法朗读出其选中状态，这时候会给屏幕阅读器用户带来一些不便。此解决方案达到的效果是：当控件聚焦的时候，选中时朗读出选中状态，未选中时不朗读出选中状态（减少听选中状态的时间）。当选中状态改变的时候及时播报出选中状态的改变。</p><!--问题说明-->
+        <p>一些产品中为了美观和其他原因使用没有选中状态的标准控件通过背景颜色的改变来表示选中状态，如使用按钮（<code>Button</code>），这样的控件屏幕阅读器无法朗读出其选中状态，这时候会给屏幕阅读器用户带来一些不便。此解决方案达到的效果是：当控件聚焦的时候，选中时朗读出选中状态，未选中时不朗读出选中状态（减少听选中状态的时间）。当选中状态改变的时候及时播报出选中状态的改变。</p><!--问题说明-->
     </div>
     <div>
         <h4  >【问题代码】</h4>
@@ -95,7 +95,7 @@ public class MainActivity extends Activity
     <div>
         <h4  >【问题解决方案描述】</h4>
         <hr />
-        <p>首先利用View.setAccessibilityDelegate()方法（低于api14可以使用v4扩展包内的ViewCompat。setAccessibilityDelegate()方法）给标准控件添加无障碍代理（View.AccessibilityDelegate），在代理中继承onInitializeAccessibilityNodeInfo()方法，在此方法中首先调用父类的实现，然后给调用AccessibilityNodeInfo的setSelected()方法设置选中状态，调用此方法设置的选中状态TalkBack朗读的时候是：当选中的时候会朗读出选中状态，未选中的时候不会朗读出选中状态。在点击事件中利用View的announceForAccessibility()方法发送一个通知，通知的内容是选中状态，如：“已选中”。此方法需api16才可用。在低于api16可以采用AccessibilityManager发送此事件的方法来播报（具体请参见代码）。</p>
+        <p>首先利用<code>View.setAccessibilityDelegate()</code>方法（低于api14可以使用v4扩展包内的<code>ViewCompat.setAccessibilityDelegate()</code>方法）给标准控件添加无障碍代理（<code>View.AccessibilityDelegate</code>），在代理中继承<code>onInitializeAccessibilityNodeInfo()</code>方法，在此方法中首先调用父类的实现，然后给调用<code>AccessibilityNodeInfo</code>的<code>setSelected()</code>方法设置选中状态，调用此方法设置的选中状态TalkBack朗读的时候是：当选中的时候会朗读出选中状态，未选中的时候不会朗读出选中状态。在点击事件中利用<code>View</code>的<code>announceForAccessibility()</code>方法发送一个通知，通知的内容是选中状态，如：“已选中”。此方法需api16才可用。在低于api16可以采用<code>AccessibilityManager</code>发送此事件的方法来播报（具体请参见代码）。</p>
     </div>
     <div>
         <h4  >【解决方案】</h4>
