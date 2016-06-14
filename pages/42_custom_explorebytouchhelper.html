@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<title>利用ExploreByTouchHelper使自定义控件支持无障碍</title>
+<link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.zclip.min.js"></script>
+<script type="text/javascript">
+$(function(){ 
+    $('#copy_input1').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code1').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input2').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code2').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+
+$(function(){ 
+    $('#copy_input3').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code3').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input4').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code4').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+</script>
+</head>
+<body>
+<div class="wrap">
+<!-- header begin -->
+<div class="header">
+    <div ><a href="http://www.siaa.org.cn/"><img src="../logo.png" alt="信息无障碍研究会"  class="logo"/></a></div>
+    <!-- nav bar begin -->
+    <div class="nav-bar">
+        <!-- nav menu begin -->
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li><a href="../index.html">返回</a></li>
+        </ul>
+        <!-- nav menu end -->
+    </div>
+    <!-- nav bar end -->
+</div>
+<!-- header end -->
+
+<!-- body begin -->
+<div class="body">
+    <h3  >利用ExploreByTouchHelper使自定义控件支持无障碍____20160601</h3>
+    <hr />
+    <div>
+        <h4  >【问题描述】</h4>
+        <hr />
+        <p>有一些自定义控件的子视图不是一个继承与<code>View</code>或其子类的控件，而是利用画笔在控件上画出来一个区域，通过检测用户的<code>onTouch()</code>事件来响应用户事件。例如：在控件上话一个矩形，在矩形中显示文本，在<code>onTouch()</code>里面检测到用户触摸的是矩形区域就表示用户选中或取消选中此选项（本解决方案中的样例就是如此）。在这种情况下应为子控件不是继承与<code>View</code>或其子类的控件所以其子控件无法发送无障碍事件，这导致屏幕阅读器用户无法操作、无法知道子控件的内容、状态等。</p><!--问题说明-->
+    </div>
+    <div>
+        <h4  >【问题代码】</h4>
+        <hr />
+        <p>下面是一个自定义控件的代码，此自定义控件利用画笔话一个矩形区域,在这个矩形区域内显示文本，通过检测<code>onTouch()</code>来响应用户的操作。当用户触摸矩形区域的时候选中（或取消选中）触摸矩形区域。选中的时候展示的颜色为红色，没有选中时为蓝色。</p>
+        <textarea rows="151" cols="120" aria-label="问题代码" id="code1">
+package com.example.android.basicaccessibility;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Paint.Align;
+import android.graphics.Paint.Style;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.os.Build;
+import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
+import android.support.v4.widget.ExploreByTouchHelper;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.accessibility.AccessibilityEvent;
+import android.widget.CheckBox;
+
+
+
+    /**
+     * Simple custom view that draws rectangular items to the screen. Each item
+     * has a checked state that may be toggled by tapping on the item.
+     */
+    public class CustomView extends View {
+        private static final int NO_ITEM = -1;
+
+        private final Paint mPaint = new Paint();
+        private final Rect mTempBounds = new Rect();
+        private final List<CustomItem> mItems = new ArrayList<CustomItem>();
+
+        public CustomView(Context context, AttributeSet attrs) {
+            super(context, attrs);
+
+        }
+        
+
+        @Override
+        public boolean onTouchEvent(MotionEvent event) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    return true;
+                case MotionEvent.ACTION_UP:
+                    final int itemIndex = getItemIndexUnder(event.getX(), event.getY());
+                    if (itemIndex >= 0) {
+                        onItemClicked(itemIndex);
+                    }
+                    return true;
+            }
+
+            return super.onTouchEvent(event);
+        }
+
+        /**
+         * Adds an item to the custom view. The item is positioned relative to
+         * the custom view bounds and its descriptions is drawn at its center.
+         *
+         * @param description The item's description.
+         * @param top Top coordinate as a fraction of the parent height, range
+         *            is [0,1].
+         * @param left Left coordinate as a fraction of the parent width, range
+         *            is [0,1].
+         * @param bottom Bottom coordinate as a fraction of the parent height,
+         *            range is [0,1].
+         * @param right Right coordinate as a fraction of the parent width,
+         *            range is [0,1].
+         */
+        public void addItem(String description, float top, float left, float bottom, float right) {
+            final CustomItem item = new CustomItem();
+            item.bounds = new RectF(top, left, bottom, right);
+            item.description = description;
+            item.checked = false;
+            mItems.add(item);
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+
+            final Paint paint = mPaint;
+            final Rect bounds = mTempBounds;
+            final int height = getHeight();
+            final int width = getWidth();
+
+            for (CustomItem item : mItems) {
+                paint.setColor(item.checked ? Color.RED : Color.BLUE);
+                paint.setStyle(Style.FILL);
+                scaleRectF(item.bounds, bounds, width, height);
+                canvas.drawRect(bounds, paint);
+                paint.setColor(Color.WHITE);
+                paint.setTextAlign(Align.CENTER);
+                canvas.drawText(item.description, bounds.centerX(), bounds.centerY(), paint);
+            }
+        }
+
+        private boolean onItemClicked(int index) {
+            final CustomItem item = getItem(index);
+            if (item == null) {
+                return false;
+            }
+
+            item.checked = !item.checked;
+            invalidate();
+
+
+            return true;
+        }
+
+        private int getItemIndexUnder(float x, float y) {
+            final float scaledX = (x / getWidth());
+            final float scaledY = (y / getHeight());
+            final int n = mItems.size();
+
+            for (int i = 0; i < n; i++) {
+                final CustomItem item = mItems.get(i);
+                if (item.bounds.contains(scaledX, scaledY)) {
+                    return i;
+                }
+            }
+
+            return NO_ITEM;
+        }
+
+        private CustomItem getItem(int index) {
+            if ((index < 0) || (index >= mItems.size())) {
+                return null;
+            }
+
+            return mItems.get(index);
+        }
+
+        private static void scaleRectF(RectF in, Rect out, int width, int height) {
+            out.top = (int) (in.top * height);
+            out.bottom = (int) (in.bottom * height);
+            out.left = (int) (in.left * width);
+            out.right = (int) (in.right * width);
+        }
+        
+        public static class CustomItem {
+            private String description;
+            private  RectF bounds;
+            private  boolean checked;
+        }
+    }
+        </textarea><br/>
+        <a href="#" id="copy_input1" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4  >【问题解决方案描述】</h4>
+        <hr />
+        <p>用v4扩展包里面的<code>ExploreByTouchHelper</code>类给自定义控件中利用画画出来的子控件添加无障碍虚拟节点，添加虚拟节点之后屏幕阅读器用户可以通过屏幕阅读器知道子控件的信息、操作子控件。添加虚拟节点的方法是首先写一个继承与<code>ExploreByTouchHelper</code>的类，继承<code>ExploreByTouchHelper</code>类必须实现5个方法，分别是：<code>getVirtualViewAt()</code>，此方法通过x、yz坐标来寻找虚拟节点；<code>getVisibleVirtualView()</code>，此方法确定需要显示哪些虚拟节点；<code>onPopulateEventVirtualView()</code>，此方法填充虚拟节点的事件；<code>onPopulateNodeVirtualView()</code>，此方法填充虚拟节点的<code>nodeInfo</code>节点信息；<code>onPerformActionForVirtualView()</code>,响应无障碍事件的操作。在<code>onPopulateNodeVirtualView()</code>方法中必须给<code>nodeInfo</code>节点设置<code>boundsInParent</code>属性和<code>text</code>(或<code>contentDescription</code>)属性，否则程序会崩溃。在自定义视图初始化的时候用<code>ViewCompat.setAccessibilityDelegate()</code>方法（也可以用<code>View.setAccessibilityDelegate()</code>方法，但是此方法只能在api14以后使用）给视图设置无障碍代理。最后要继承<code>View</code>的<code>dispatchHoverEvent()</code>方法,在此方法中把<code>HoverEvent</code>发送给<code>ExploreByTouchHelper</code>类的无障碍代理。</p>
+    </div>
+    <div>
+        <h4  >【解决方案】</h4>
+        <hr />
+		<p>下面的代码达到的效果是自定义控件中的选项可有焦点、能正确朗读，能正常操作。</p>
+        <textarea rows="280" cols="120" aria-label="解决方案代码" id="code2">
+package com.example.android.basicaccessibility;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Paint.Align;
+import android.graphics.Paint.Style;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.os.Build;
+import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
+import android.support.v4.widget.ExploreByTouchHelper;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.accessibility.AccessibilityEvent;
+import android.widget.CheckBox;
+
+
+
+    /**
+     * Simple custom view that draws rectangular items to the screen. Each item
+     * has a checked state that may be toggled by tapping on the item.
+     */
+    public class CustomView extends View {
+        private static final int NO_ITEM = -1;
+
+        private final Paint mPaint = new Paint();
+        private final Rect mTempBounds = new Rect();
+        private final List<CustomItem> mItems = new ArrayList<CustomItem>();
+        private CustomViewTouchHelper mTouchHelper;
+
+        public CustomView(Context context, AttributeSet attrs) {
+            super(context, attrs);
+			//Set up accessibility helper class.
+			//设置无障碍代理
+            mTouchHelper = new CustomViewTouchHelper(this);
+            ViewCompat.setAccessibilityDelegate(this, mTouchHelper);
+        }
+        
+		//继承dispatchHoverEvent()方法，在此方法中利用无障碍代理发送事件
+        @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+        @Override
+        public boolean dispatchHoverEvent(MotionEvent event) {
+            // Always attempt to dispatch hover events to accessibility first.
+            if (mTouchHelper !=null) 
+            if (mTouchHelper.dispatchHoverEvent(event)) {
+                return true;
+            }
+
+            return super.dispatchHoverEvent(event);
+        }
+
+        @Override
+        public boolean onTouchEvent(MotionEvent event) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    return true;
+                case MotionEvent.ACTION_UP:
+                    final int itemIndex = getItemIndexUnder(event.getX(), event.getY());
+                    if (itemIndex >= 0) {
+                        onItemClicked(itemIndex);
+                    }
+                    return true;
+            }
+
+            return super.onTouchEvent(event);
+        }
+
+        /**
+         * Adds an item to the custom view. The item is positioned relative to
+         * the custom view bounds and its descriptions is drawn at its center.
+         *
+         * @param description The item's description.
+         * @param top Top coordinate as a fraction of the parent height, range
+         *            is [0,1].
+         * @param left Left coordinate as a fraction of the parent width, range
+         *            is [0,1].
+         * @param bottom Bottom coordinate as a fraction of the parent height,
+         *            range is [0,1].
+         * @param right Right coordinate as a fraction of the parent width,
+         *            range is [0,1].
+         */
+        public void addItem(String description, float top, float left, float bottom, float right) {
+            final CustomItem item = new CustomItem();
+            item.bounds = new RectF(top, left, bottom, right);
+            item.description = description;
+            item.checked = false;
+            mItems.add(item);
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+
+            final Paint paint = mPaint;
+            final Rect bounds = mTempBounds;
+            final int height = getHeight();
+            final int width = getWidth();
+
+            for (CustomItem item : mItems) {
+                paint.setColor(item.checked ? Color.RED : Color.BLUE);
+                paint.setStyle(Style.FILL);
+                scaleRectF(item.bounds, bounds, width, height);
+                canvas.drawRect(bounds, paint);
+                paint.setColor(Color.WHITE);
+                paint.setTextAlign(Align.CENTER);
+                canvas.drawText(item.description, bounds.centerX(), bounds.centerY(), paint);
+            }
+        }
+
+        private boolean onItemClicked(int index) {
+            final CustomItem item = getItem(index);
+            if (item == null) {
+                return false;
+            }
+
+            item.checked = !item.checked;
+            invalidate();
+
+if (mTouchHelper != null) {
+            // Since the item's checked state is exposed to accessibility
+            // services through its AccessibilityNodeInfo, we need to invalidate
+            // the item's virtual view. At some point in the future, the
+            // framework will obtain an updated version of the virtual view.
+            mTouchHelper.invalidateVirtualView(index);
+
+            // We also need to let the framework know what type of event
+            // happened. Accessibility services may use this event to provide
+            // appropriate feedback to the user.
+            mTouchHelper.sendEventForVirtualView(index, AccessibilityEvent.TYPE_VIEW_CLICKED);
+}
+
+            return true;
+        }
+
+        private int getItemIndexUnder(float x, float y) {
+            final float scaledX = (x / getWidth());
+            final float scaledY = (y / getHeight());
+            final int n = mItems.size();
+
+            for (int i = 0; i < n; i++) {
+                final CustomItem item = mItems.get(i);
+                if (item.bounds.contains(scaledX, scaledY)) {
+                    return i;
+                }
+            }
+
+            return NO_ITEM;
+        }
+
+        private CustomItem getItem(int index) {
+            if ((index < 0) || (index >= mItems.size())) {
+                return null;
+            }
+
+            return mItems.get(index);
+        }
+
+        private static void scaleRectF(RectF in, Rect out, int width, int height) {
+            out.top = (int) (in.top * height);
+            out.bottom = (int) (in.bottom * height);
+            out.left = (int) (in.left * width);
+            out.right = (int) (in.right * width);
+        }
+        
+		//继承与ExploreByTouchHelper的无障碍代理类
+        private class CustomViewTouchHelper extends ExploreByTouchHelper {
+            private final Rect mTempRect = new Rect();
+
+            public CustomViewTouchHelper(View forView) {
+                super(forView);
+                                        }
+
+            @Override
+            protected int getVirtualViewAt(float x, float y) {
+                // We also perform hit detection in onTouchEvent(), and we can
+                // reuse that logic here. This will ensure consistency whether
+                // accessibility is on or off.
+                                final int index = getItemIndexUnder(x, y);
+                if (index == NO_ITEM) {
+                    return ExploreByTouchHelper.INVALID_ID;
+                }
+
+                return index;
+            }
+
+            @Override
+            protected void getVisibleVirtualViews(List<Integer> virtualViewIds) {
+                // Since every item should be visible, and since we're mapping
+                // directly from item index to virtual view id, we can just add
+                // every available index in the item list.
+                                final int n = mItems.size();
+                for (int i = 0; i < n; i++) {
+                    virtualViewIds.add(i);
+                }
+            }
+
+            @Override
+            protected void onPopulateEventForVirtualView(
+                    int virtualViewId, AccessibilityEvent event) {
+                final CustomItem item = getItem(virtualViewId);
+                if (item == null) {
+                    throw new IllegalArgumentException("Invalid virtual view id");
+                }
+
+                // The event must be populated with text, either using
+                // getText().add() or setContentDescription(). Since the item's
+                // description is displayed visually, we'll add it to the event
+                // text. If it was only used for accessibility, we would use
+                // setContentDescription().
+                event.setClassName(CheckBox.class.getName());
+                event.getText().add(item.description);
+            }
+
+            @Override
+            protected void onPopulateNodeForVirtualView(
+                    int virtualViewId, AccessibilityNodeInfoCompat node) {
+                                    final CustomItem item = getItem(virtualViewId);
+                if (item == null) {
+                    throw new IllegalArgumentException("Invalid virtual view id");
+                }
+
+                // Node and event text and content descriptions are usually
+                // identical, so we'll use the exact same string as before.
+                node.setClassName(CheckBox.class.getName());
+                node.setText(item.description);
+
+                // Reported bounds should be consistent with those used to draw
+                // the item in onDraw(). They should also be consistent with the
+                // hit detection performed in getVirtualViewAt() and
+                // onTouchEvent().
+                final Rect bounds = mTempRect;
+                final int height = getHeight();
+                final int width = getWidth();
+                scaleRectF(item.bounds, bounds, width, height);
+                node.setBoundsInParent(bounds);
+
+                // Since the user can tap an item, add the CLICK action. We'll
+                // need to handle this later in onPerformActionForVirtualView.
+                node.addAction(AccessibilityNodeInfoCompat.ACTION_CLICK);
+
+                // This item has a checked state.
+                node.setCheckable(true);
+                node.setChecked(item.checked);
+            }
+
+            @Override
+            protected boolean onPerformActionForVirtualView(
+                    int virtualViewId, int action, Bundle arguments) {
+                                    switch (action) {
+                    case AccessibilityNodeInfoCompat.ACTION_CLICK:
+                        // Click handling should be consistent with
+                        // onTouchEvent(). This ensures that the view works the
+                        // same whether accessibility is turned on or off.
+                        return onItemClicked(virtualViewId);
+                }
+
+                return false;
+            }
+
+        }
+
+        public static class CustomItem {
+            private String description;
+            private  RectF bounds;
+            private  boolean checked;
+        }
+    }
+        </textarea><br/>
+        <a href="#" id="copy_input2" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4  >【前后效果图对比】</h4>
+        <hr />
+        <table>
+            <tr>
+                <td><img src="../images/42-1.png" class="litu" alt="" aria-labelledby="img1_label"/></td><td><img src="../images/42-2.png" class="litu" alt="" aria-labelledby="img2_label"/></td>
+            </tr>
+            <tr>
+                <td id="img1_label">优化前，网格无焦点；</td><td id="img2_label">优化后，网格有焦点，且聚焦朗读“未选中 选项1 复选框” 双击朗读“选项1 已选中”，重新聚焦朗读“已选中 选项1 复选框”；</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h4  >【扩展】</h4>
+        <hr />
+        <p>利用ExploreByTouchHelper使自定义控件支持无障碍效果<a href="../apk/42_apk.apk">apk</a></p>
+    </div>
+    <div>
+        <h4  >【更多】</h4>
+        <hr />
+        <p><a name="fujian1"></a>【附1】 MainActivity的代码</p>
+		<textarea rows="22" cols="120" aria-label="解决方案代码" id="code3">
+package com.example.android.basicaccessibility;
+import android.app.Activity;
+import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.view.accessibility.AccessibilityNodeProviderCompat;
+import android.support.v4.widget.ExploreByTouchHelper;
+import android.view.View;
+public class MainActivity extends Activity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+
+        final CustomView customView = (CustomView) findViewById(R.id.custom_view);
+
+        // Adds an item at the top-left quarter of the custom view.
+        customView.addItem(getString(R.string.item_a), 0, 0, 0.5f, 0.5f);
+        customView.addItem(getString(R.string.item_b), 0.5f, 0.5f, 1, 1);
+    }
+
+}
+        </textarea><br/>
+        <a href="#" id="copy_input3" class="copy">复制内容</a>
+		<p><a name="fujian1"></a>【附2】 activity_main布局文件代码</p>
+		<textarea rows="17" cols="120" aria-label="解决方案代码" id="code4">
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+	<TextView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="@string/description"/>
+
+	<com.example.android.basicaccessibility.CustomView
+		android:id="@+id/custom_view"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		/>
+</LinearLayout>
+        </textarea><br/>
+        <a href="#" id="copy_input4" class="copy">复制内容</a> 
+    </div>
+</div>
+<!-- body end -->
+<br/>
+<hr/>
+<!-- footer begin -->
+<div class="footer">
+<p class="copyright">深圳市信息无障碍研究会 版权所有.Copyright © 2016 ARA. All 
+Rights Reserved. <a href="http://www.miibeian.gov.cn/" target="_blank">粤ICP备10065437号</a> </p>
+<p class="copyright">地址：深圳市福田区雨田路1号富莲大厦一栋一层</p>
+</div>
+<!-- footer end -->
+</div>
+<!-- wrap end -->
+</body>
+</html>

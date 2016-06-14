@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<title>为没有文本只有图片的按钮添加替代文本</title>
+<link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.zclip.min.js"></script>
+<script type="text/javascript">
+$(function(){ 
+    $('#copy_input1').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code1').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input2').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code2').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+</script>
+</head>
+<body>
+<div class="wrap">
+<!-- header begin -->
+<div class="header">
+    <div ><a href="http://www.siaa.org.cn/"><img src="../logo.png" alt="信息无障碍研究会"  class="logo"/></a></div>
+    <!-- nav bar begin -->
+    <div class="nav-bar">
+        <!-- nav menu begin -->
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li><a href="../index.html">返回</a></li>
+        </ul>
+        <!-- nav menu end -->
+    </div>
+    <!-- nav bar end -->
+</div>
+<!-- header end -->
+
+<!-- body begin -->
+<div class="body">
+    <h3>为没有文本只有图片的按钮添加替代文本_____20160411</h3>
+    <hr />
+    <div>
+        <h4>【问题描述】</h4>
+        <hr />
+        <p>此按钮上没有文本屏幕阅读器只朗读出控件类型，用户无法通过这个控件类型知道此按钮的功能、目的或展示的内容。　</p><!--问题说明-->
+    </div>
+    <div>
+        <h4>【问题代码】</h4>
+        <hr />
+        <p></p>
+        <textarea rows="9" cols="120" aria-label="问题代码" id="code1">
+<Button
+  android:id="@+id/button"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:background="@drawable/background”
+android:foreground="@drawable/foreground"
+  android:foregroundGravity="center"
+  .../>
+        </textarea><br/>
+        <a href="#" id="copy_input1" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【问题解决方案描述】</h4>
+        <hr />
+        <p>为了提供有关界面控件的文本信息（来代替视图提示），可使用 android:contentDescription属性。在这个属性中你提供的文本在屏幕上是不可见的，但如果用户启用了无障碍服务，提供声音提示，那么属性中的描述就能够朗读给用户。　</p>
+    </div>
+    <div>
+        <h4>【解决方案】</h4>
+        <hr />
+        <textarea rows="12" cols="120" aria-label="解决方案代码" id="code2">
+<Button
+  android:id="@+id/button"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:background="@drawable/background"
+  android:foreground="@drawable/foreground"
+  android:foregroundGravity="center"
+	<!--下面的@string/button_contentdescription是替代文本,内容是：“图片”，在实际应用中根据按钮的功能、目的、展示的内容填写替代文本-->
+  android:contentDescription="@string/button_contentdescription"
+  .../>
+        </textarea><br/>
+        <a href="#" id="copy_input2" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【前后效果图对比】</h4>
+        <hr />
+        <table>
+            <tr>
+                <td><img src="../images/4-1.png" class="litu" alt="" aria-labelledby="img1_label"/></td><td><img src="../images/4-2.png" class="litu" alt="" aria-labelledby="img2_label"/></td>
+            </tr>
+            <tr>
+                <td id="img1_label">优化前，屏幕阅读器朗读为“按钮”;</td><td id="img2_label">优化后，屏幕阅读器朗读为“图片按钮”;</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h4>【扩展】</h4>
+        <hr />
+        <p></p>
+    </div>
+    <div>
+        <h4>【更多】</h4>
+        <hr />
+        <ol></ol>
+    </div>
+</div>
+<!-- body end -->
+
+<!-- footer begin -->
+<div class="footer">
+</div>
+<!-- footer end -->
+</div>
+<!-- wrap end -->
+</body>
+</html>

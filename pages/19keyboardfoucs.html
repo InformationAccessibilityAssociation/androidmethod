@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<title>给控件设置焦点</title>
+<link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.zclip.min.js"></script>
+<script type="text/javascript">
+$(function(){ 
+    $('#copy_input1').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code1').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input2').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code2').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+</script>
+</head>
+<body>
+<div class="wrap">
+<!-- header begin -->
+<div class="header">
+    <div ><a href="http://www.siaa.org.cn/"><img src="../logo.png" alt="信息无障碍研究会"  class="logo"/></a></div>
+    <!-- nav bar begin -->
+    <div class="nav-bar">
+        <!-- nav menu begin -->
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li><a href="../index.html">返回</a></li>
+        </ul>
+        <!-- nav menu end -->
+    </div>
+    <!-- nav bar end -->
+</div>
+<!-- header end -->
+
+<!-- body begin -->
+<div class="body">
+    <h3>给控件设置焦点____20160509</h3>
+    <hr />
+    <div>
+        <h4>【问题描述】</h4>
+        <hr />
+        <p>除了用触摸屏浏览app之外，android应用程序还可以用键盘、轨迹球等设备进行浏览，这些设备可以方便视障用户、肢体残疾的用户更好的使用android。但是android应用程序中的控件没有焦点用这些设备就不能很好的浏览应用程序中的控件、使用应用程序。控件没有焦点同时也会导致视障用户在开启屏幕阅读器的时候用触摸屏无法浏览到没有焦点的控件、操作那些没有焦点的控件。</p><!--问题说明-->
+    </div>
+    <div>
+        <h4>【问题代码】</h4>
+        <hr />
+        <p></p>
+        <textarea rows="30" cols="120" aria-label="问题代码" id="code1">
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="horizontal"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content">
+
+	<ImageView android:id="@+id/header"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" 
+		android:paddingLeft="10dp"
+		android:src="@drawable/libai"/>
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+		<TextView android:id="@+id/name"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:textSize="20dp"
+			android:textColor="#f0f"
+			android:paddingLeft="10dp"
+			android:text="李白"/>
+		<TextView android:id="@+id/desc"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:textSize="14dp"
+			android:paddingLeft="10dp"
+			android:text="浪漫主义诗人"/>
+	</LinearLayout>
+</LinearLayout>
+        </textarea><br/>
+        <a href="#" id="copy_input1" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【问题解决方案描述】</h4>
+        <hr />
+        <p>Android提供了android:focusable属性来启用焦点导航当等于true的时候是启用焦点导航，同时android提供了在触摸屏下启用焦点导航的属性android:focsableInTouchMode，此属性等于true的时候触摸屏下启用焦点导航。</p>
+    </div>
+    <div>
+        <h4>【解决方案】</h4>
+        <hr />
+		<p>下面代码中利用android:focusable、android:focusableInTouchMode两个属性启用焦点导航。 注：一般情况下不要在父试图中启用焦点导航，这样会导致大焦点出现； </p>
+        <textarea rows="36" cols="120" aria-label="解决方案代码" id="code2">
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="horizontal"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content">
+	<ImageView android:id="@+id/header"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" 
+		android:paddingLeft="10dp"
+		android:src="@drawable/libai"
+		android:contentDescription=”李白的头像”
+		android:focusable=”true”
+		android:focusableInTouchMode=”true”/>
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+		<TextView android:id="@+id/name"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:textSize="20dp"
+			android:textColor="#f0f"
+			android:paddingLeft="10dp"
+			android:text="李白"
+			android:focusable=”true”
+			android:focusableInTouchMode=”true”/>
+		<TextView android:id="@+id/desc"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:textSize="14dp"
+			android:paddingLeft="10dp"
+			android:text="浪漫主义诗人"
+			android:focusable=”true”
+			android:focusableInTouchMode=”true”/>
+	</LinearLayout>
+</LinearLayout>
+        </textarea><br/>
+        <a href="#" id="copy_input2" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【前后效果图对比】</h4>
+        <hr />
+        <table>
+            <tr>
+                <td><img src="../images/19-1.png" class="litu" alt="" aria-labelledby="img1_label"/></td><td><img src="../images/19-2.png" class="litu" alt="" aria-labelledby="img2_label"/></td>
+            </tr>
+            <tr>
+                <td id="img1_label">优化前，触摸有两个焦点：“李白”“浪漫主义诗人”；</td><td id="img2_label">优化后，触摸有三个焦点：“李白的头像”“李白”“浪漫主义诗人”；</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h4>【扩展】</h4>
+        <hr />
+        <p></p>
+    </div>
+    <div>
+        <h4>【更多】</h4>
+        <hr />
+        <ol></ol>
+    </div>
+</div>
+<!-- body end -->
+
+<!-- footer begin -->
+<div class="footer">
+</div>
+<!-- footer end -->
+</div>
+<!-- wrap end -->
+</body>
+</html>

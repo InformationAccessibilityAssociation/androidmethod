@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<title>让已正则表达式替换方式展示的表情能正确朗读</title>
+<link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.zclip.min.js"></script>
+<script type="text/javascript">
+$(function(){ 
+    $('#copy_input1').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code1').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input2').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code2').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+</script>
+</head>
+<body>
+<div class="wrap">
+<!-- header begin -->
+<div class="header">
+    <div ><a href="http://www.siaa.org.cn/"><img src="../logo.png" alt="信息无障碍研究会"  class="logo"/></a></div>
+    <!-- nav bar begin -->
+    <div class="nav-bar">
+        <!-- nav menu begin -->
+        <ul>
+           <li><a href="../index.html">首页</a></li>
+            <li><a href="../index.html">返回</a></li>
+        </ul>
+        <!-- nav menu end -->
+    </div>
+    <!-- nav bar end -->
+</div>
+<!-- header end -->
+
+<!-- body begin -->
+<div class="body">
+    <h3>让已正则表达式替换方式展示的表情能正确朗读____20160429</h3>
+    <hr />
+    <div>
+        <h4>【问题描述】</h4>
+        <hr />
+        <p>用正则表达式替换的方式在文本框（TextView）、编辑框（EditText）等控件上展示表情的时候，用正则表达式把表情代码替换成了表情之后，屏幕阅读器朗读的还是表情代码，用户无法清楚的知道这是什么表情。例如一个文本框上显示了“感谢你送的蛋糕”+一个表情代码是：“、::wx”，屏幕阅读器朗读为：“感谢你送的蛋糕/::wx”，用户无法从表情代码中知道这是一个“微笑”表情。</p><!--问题说明-->
+    </div>
+    <div>
+        <h4>【问题代码】</h4>
+        <hr />
+        <p>下面的代码给界面中的文本框（TextView）添加了一个表情。因为没有做过处理所以表情朗读为表情代码
+注：已正则表达式替代方式展示表情的方法见此解决方案的“附1“。
+</p>
+        <textarea rows="20" cols="120" aria-label="问题代码" id="code1">
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.TextView;
+
+public class ToggleActivity extends Activity {
+private TextView smiley_textview;
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_toggle);
+		smiley_textview = (TextView)findViewById(R.id.smiley);
+		//展示表情
+		face();
+		
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.toggle, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.action_settings) {
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	//正则表达式方式显示表情
+	private void face() {
+		SmileyParser.init(this);    
+		SmileyParser smileyParser;
+		smileyParser = SmileyParser.getInstance();//进行初始化    
+		String faceStr = "/::wx";
+		String newContent = smiley_textview.getText().toString() + faceStr;
+		CharSequence replace = smileyParser.strToSmiley(newContent);
+		smiley_textview.setText(replace);
+	}
+}
+
+        </textarea><br/>
+        <a href="#" id="copy_input1" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【问题解决方案描述】</h4>
+        <hr />
+        <p>给添加了表情的文本框（TextView）、编辑框（EditText）或其他展示表情的控件添加View.AccessibilityDelegate,并重写onInitializeAccessibilityEvent()和onInitializeAccessibilityNodeInfo()两个方法，在这两个方法中，获取到显示的字符串，把字符串中的表情代码替换成用户可以理解的说明文本，最后把替换好的文本用setContentDescription()设置到AccessibilityEvent和AccessibilityNodeInfo中。</p>
+    </div>
+    <div>
+        <h4>【解决方案】</h4>
+        <hr />
+		<p>下面的代码给文本框（TextView）添加了View.AccessibilityDelegate并在此代理中对表情代码进行了处理。最终达到的目的是屏幕阅读器不在朗读表情代码，儿是朗读有意义的字符串。其中用的ConvertSmiley类的核心思想是查找出字符串中的表情代码并替换成对应的说明字符串。</p>
+        <textarea rows="20" cols="120" aria-label="解决方案代码" id="code2">
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.TextView;
+
+public class ToggleActivity extends Activity {
+private TextView smiley_textview;
+//此变量用于把表情代码转换成有意义的字符串
+private ConvertSmiley convert; 
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_toggle);
+		//初始化
+		convert = new ConvertSmiley(getResources().getStringArray(R.array.smiley_array), getResources().getStringArray(R.array.convert_smiley_array)); 
+		smiley_textview = (TextView)findViewById(R.id.smiley);
+		//添加ViewAccessibilityDelegate
+		smiley_textview.setAccessibilityDelegate(mDelegate);
+		//显示表情
+		face();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.toggle, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.action_settings) {
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+	
+	//正则表达式方式显示表情
+	private void face() {
+		SmileyParser.init(this);    
+		SmileyParser smileyParser;
+		smileyParser = SmileyParser.getInstance();//进行初始化    
+		String faceStr = "/::wx";
+		String newContent = smiley_textview.getText().toString() + faceStr;
+		CharSequence replace = smileyParser.strToSmiley(newContent);
+		smiley_textview.setText(replace);
+	}
+
+	//View.AccessibilityDelegate代理
+	private View.AccessibilityDelegate mDelegate = new  View.AccessibilityDelegate() {
+		@Override
+		public void onInitializeAccessibilityEvent(View host, AccessibilityEvent event) {
+			super.onInitializeAccessibilityEvent(host, event);
+			//把字符串中的表情代码转化成有意义的字符串
+			String temp = convert.convertSmiley(((TextView)host).getText().toString());
+			//把转化之后的字符串设置到contentDescription
+			event.setContentDescription(temp);
+		}
+
+		@Override
+		public void onInitializeAccessibilityNodeInfo (View host, AccessibilityNodeInfo info) {
+			super.onInitializeAccessibilityNodeInfo(host, info);
+			//把字符串中的表情代码进行转化
+			String temp = convert.convertSmiley(((TextView)host).getText().toString());
+			//把转换之后的字符串设置到contentDescripion
+			info.setContentDescription(temp);
+		}
+	};
+}
+
+下面是ConvertSmiley类的实现代码
+import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+public class ConvertSmiley {
+	//表情代码数组，如“/wx”
+	private String[] mSmileys;
+	//表情代码要转化成的中文数组，如：“/微笑”
+	private String[] mConvertSmileys;
+	//pattern
+	private Pattern mPattern;
+	private HashMap<String, String> mConvert;
+
+	//构造函数，当提供的smiley和convertSmiley两个字符数组的长度不一致的时候会抛出IllegalStateException异常
+	public ConvertSmiley (String[] smiley, String[] convertSmiley) {
+		if (smiley.length != convertSmiley.length) {
+			throw new IllegalStateException("Smiley array and convertSmiley array length mismatch");    
+		}
+		mSmileys = smiley;
+		mConvertSmileys = convertSmiley;
+		mConvert = buildConvert();
+		mPattern = buildPattern();
+}
+
+    // 构建正则表达式    
+private Pattern buildPattern() {    
+	StringBuilder patternString = new StringBuilder(mSmileys.length * 3);
+	patternString.append('(');
+	for (String s : mSmileys) {
+		patternString.append(Pattern.quote(s));
+		patternString.append('|');
+		}
+	patternString.replace(patternString.length() - 1, patternString.length(), ")");
+	return Pattern.compile(patternString.toString());
+}
+
+
+//产生convert集合
+private HashMap<String, String> buildConvert () {
+	HashMap<String ,String> temp = new HashMap<String, String>(mConvertSmileys.length);
+	for (int i = 0; i < mConvertSmileys.length; i++) {
+		temp.put(mSmileys[i], mConvertSmileys[i]);
+	}
+	return temp; 
+}
+
+//把原来的字符串中的表情代码替换成相应的中文代码
+public String convertSmiley(String text) {
+	String temp = text;
+	Matcher matcher = mPattern.matcher(text);
+	while (matcher.find()) {
+		String smileyString = matcher.group();
+		String convertString = mConvert.get(smileyString);
+		temp = temp.replace(smileyString, convertString);
+	}
+	return temp;
+	}
+}
+下面是数组资源smiley_array和convert_smiley_array的定义代码
+<resources >
+   <string-array name="smiley_array">    
+        <!--有几种表情就写几个item......-->
+        <item>/::wx</item>
+        <item>/::dk</item>
+        <item>/::zd</item>
+<item>/::kl</item>
+<item>/::gx</item>    
+    </string-array>
+
+       <string-array name="convert_smiley_array">    
+        <!--有几种表情就写几个item......-->
+        <item>/微笑</item>
+        <item>/大哭</item>
+        <item>/炸弹</item>
+<item>/快乐</item>
+<item>/感谢</item>    
+    </string-array>    
+</resources>    
+        </textarea><br/>
+        <a href="#" id="copy_input2" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【前后效果图对比】</h4>
+        <hr />
+        <table>
+            <tr>
+                <td><img src="../images/1-1.png" class="litu" alt="" aria-labelledby="img1_label"/></td><td><img src="../images/1-2.png" class="litu" alt="" aria-labelledby="img2_label"/></td>
+            </tr>
+            <tr>
+                <td id="img1_label">未优化前，屏幕阅读器朗读为”感谢你送的蛋糕 wx”;</td><td id="img2_label">优化后，屏幕阅读器朗读为”感谢你送的蛋糕 微笑”;</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h4>【扩展】</h4>
+        <hr />
+        <p>在EditText（编辑框）展示表情的时候此种解决方案也试用。</p>
+    </div>
+    <div>
+        <h4>【更多】</h4>
+        <hr />
+		<p>在TextView中使用html的img元素显示表情图片的解决方案暂时没有找到。</p>
+		<a href="1_fujian.html">【附】 已正则表达式替代方式展示表情</a>
+        <ol></ol>
+    </div>
+</div>
+<!-- body end -->
+
+<!-- footer begin -->
+<div class="footer">
+</div>
+<!-- footer end -->
+</div>
+<!-- wrap end -->
+</body>
+</html>

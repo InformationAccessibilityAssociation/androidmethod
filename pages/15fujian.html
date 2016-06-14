@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<title>附件1</title>
+<link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.zclip.min.js"></script>
+<script type="text/javascript">
+$(function(){ 
+    $('#copy_input1').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code1').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input2').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code2').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+</script>
+</head>
+<body>
+<div class="wrap">
+<!-- header begin -->
+<div class="header">
+    <div ><a href="http://www.siaa.org.cn/"><img src="../logo.png" alt="信息无障碍研究会"  class="logo"/></a></div>
+    <!-- nav bar begin -->
+    <div class="nav-bar">
+        <!-- nav menu begin -->
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li><a href="15listviewimgcd.html">返回</a></li>
+        </ul>
+        <!-- nav menu end -->
+    </div>
+    <!-- nav bar end -->
+</div>
+<!-- header end -->
+
+<!-- body begin -->
+<div class="body">
+    <h3>附件1----在Adapter的getView()方法中动态给ListView中的图片设置描述文本</h3>
+    <hr />
+    <div>
+        <h4>1、</h4>
+        <hr />
+        <p>MainActivity.Xml</p><!--问题说明-->
+		<textarea rows="12" cols="120">
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+	<ListView
+		android:id="@+id/myList"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"/>
+</LinearLayout>
+		</textarea>
+    </div>
+	
+	<div>
+        <h4>2、</h4>
+        <hr />
+        <p>MainActivity.java</p><!--问题说明-->
+		<textarea rows="40" cols="120">
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
+
+
+public class MainActivity extends Activity
+{
+	private ListView myList;
+	private String keys[] = new String[] { "personName", "header" , "desc"};
+	private int ids[] = new int[] { R.id.name, R.id.header , R.id.desc };
+	private List<Map<String, Object>> data;
+	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
+
+		myList = (ListView) findViewById(R.id.myList);
+		data = getData();
+		MyAdapter adapter = new MyAdapter(this, data, keys, ids);
+		myList.setAdapter(adapter);
+		myList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+		@Override
+		public void onItemClick(AdapterView<?> arg0,View arg1, int arg2, long arg3) {
+			Toast.makeText(MainActivity.this, data.get(arg2).get(keys[0])+"被单机", Toast.LENGTH_SHORT).show();
+		}		
+		});
+	}
+	
+	private List<Map<String,Object>> getData() {
+		String[] names = new String[]
+			{ "虎头", "弄玉", "李清照", "李白"};
+		String[] descs = new String[]
+			{ "可爱的小孩", "一个擅长音乐的女孩", "一个擅长文学的女性", "浪漫主义诗人"};
+		int[] imageIds = new int[]
+			{ R.drawable.tiger , R.drawable.nongyu, R.drawable.qingzhao , R.drawable.libai};		
+		// 创建一个List集合，List集合的元素是Map
+		List<Map<String, Object>> listItems =
+				new ArrayList<Map<String, Object>>();
+		for (int i = 0; i < names.length; i++)
+		{
+			Map<String, Object> listItem = new HashMap<String, Object>();
+			listItem.put(keys[0], names[i]);
+			listItem.put(keys[1], imageIds[i]);
+			listItem.put(keys[2], descs[i]);
+			listItems.add(listItem);
+		}
+		return listItems;
+	}
+}
+		</textarea>
+    </div>	
+</div>
+<!-- body end -->
+
+<!-- footer begin -->
+<div class="footer">
+</div>
+<!-- footer end -->
+</div>
+<!-- wrap end -->
+</body>
+</html>

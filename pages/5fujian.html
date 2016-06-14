@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<title>因控件过小导致的按钮响应事件错乱或不响应的解决方案--附件1</title>
+<link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.zclip.min.js"></script>
+<script type="text/javascript">
+$(function(){ 
+    $('#copy_input1').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code1').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+</script>
+</head>
+<body>
+<div class="wrap">
+<!-- header begin -->
+<div class="header">
+    <div ><a href="http://www.siaa.org.cn/"><img src="../logo.png" alt="信息无障碍研究会"  class="logo"/></a></div>
+    <!-- nav bar begin -->
+    <div class="nav-bar">
+        <!-- nav menu begin -->
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li><a href="5buttonxiangying.html">返回</a></li>
+        </ul>
+        <!-- nav menu end -->
+    </div>
+    <!-- nav bar end -->
+</div>
+<!-- header end -->
+
+<!-- body begin -->
+<div class="body">
+    <h3>因控件过小导致的按钮响应事件错乱或不响应的解决方案--附件1</h3>
+    <hr />
+        <p>【附1】 MainActivity.java的代码</p>
+        <textarea rows="50" cols="120" aria-label="问题代码" id="code1">
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
+
+public class ButtonDemo extends Activity  {
+	TextView tv =null;
+	String promote="你喜欢的手机品牌是？";
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.button);
+		tv = (TextView) findViewById(R.id.TextView01);
+		/*Button button1 = (Button) findViewById(R.id.Button01);
+		button1.setOnClickListener(this);
+		Button button2= (Button) findViewById(R.id.Button02);
+		button2.setOnClickListener(this);
+		Button button3 = (Button) findViewById(R.id.Button03);
+		button3.setOnClickListener(this);
+		button1.setOnClickListener(new OnClickListener() {
+
+			public void onClick(View v) {
+				Button b = (Button)v;
+					tv.setText(promote+b.getText().toString());
+		}
+		});
+		Button button2 = (Button) findViewById(R.id.Button02);
+		button2.setOnClickListener(new OnClickListener() {
+
+			public void onClick(View v) {
+				Button b = (Button)v;
+					tv.setText(promote+b.getText().toString());
+		}
+
+		});
+		Button button3 = (Button) findViewById(R.id.Button03);
+		button3.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				Button b = (Button)v;
+						tv.setText(promote+b.getText().toString());
+			}
+		});*/
+		ImageButton button4 = (ImageButton) findViewById(R.id.ImageButton);
+		button4.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				
+						tv.setText(promote+" 暂时保密吆");
+			}
+		});
+
+	}
+		public void onClick(View v) {
+		// TODO Auto-generated method stub
+		Button b = (Button)v;
+		if(b.getText()!=null)
+		tv.setText(promote+b.getText().toString());
+		
+	}
+}
+
+        </textarea><br/>
+        <a href="#" id="copy_input1" class="copy">复制内容</a> 
+    
+</div>
+<!-- body end -->
+
+<!-- footer begin -->
+<div class="footer">
+</div>
+<!-- footer end -->
+</div>
+<!-- wrap end -->
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<title>为EditText添加提示信息（hint）</title>
+<link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.zclip.min.js"></script>
+<script type="text/javascript">
+$(function(){ 
+    $('#copy_input1').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code1').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input2').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code2').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+</script>
+</head>
+<body>
+<div class="wrap">
+<!-- header begin -->
+<div class="header">
+    <div ><a href="http://www.siaa.org.cn/"><img src="../logo.png" alt="信息无障碍研究会"  class="logo"/></a></div>
+    <!-- nav bar begin -->
+    <div class="nav-bar">
+        <!-- nav menu begin -->
+        <ul>
+           <li><a href="../index.html">首页</a></li>
+            <li><a href="../index.html">返回</a></li>
+        </ul>
+        <!-- nav menu end -->
+    </div>
+    <!-- nav bar end -->
+</div>
+<!-- header end -->
+
+<!-- body begin -->
+<div class="body">
+    <h3>为EditText添加提示信息（hint）____20160411</h3>
+    <hr />
+    <div>
+        <h4>【问题描述】</h4>
+        <hr />
+        <p>没有添加提示信息（hint）用户无法再此EditText获得焦点的时候知道应当输入什么内容。　</p><!--问题说明-->
+    </div>
+    <div>
+        <h4>【问题代码】</h4>
+        <hr />
+        <p></p>
+        <textarea rows="8" cols="120" aria-label="问题代码" id="code1">
+			<EditText 
+				android:layout_width="match_parent" 
+				android:layout_height="50dp"
+				android:textColor="#000000" 
+				android:background="#FFFFFF" 
+				android:layout_margin="10dp" 
+				android:gravity="center" />
+        </textarea><br/>
+        <a href="#" id="copy_input1" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【问题解决方案描述】</h4>
+        <hr />
+        <p>为了提供有关界面控件的文本信息（来代替视图提示），可使用 android:contentDescription属性。在这个属性中你提供的文本在屏幕上是不可见的，但如果用户启用了无障碍服务，提供声音提示，那么属性中的描述就能够朗读给用户。对于文本框(EditText),提供一个android:hint属性,以帮助用户了解需要输入哪些内容。当文本框内已经有内容的时候此提示信息消失。　</p>
+    </div>
+    <div>
+        <h4>【解决方案】</h4>
+        <hr />
+        <textarea rows="10" cols="120" aria-label="解决方案代码" id="code2">
+			<EditText 
+				android:layout_width="match_parent" 
+				android:layout_height="50dp"
+				android:textColor="#000000" 
+				android:background="#FFFFFF" 
+				android:layout_margin="10dp" 
+				android:gravity="center" 
+				<!--下面是提示文本(hint），在代码中可以用setHint()方法设置此属性-->
+				android:hint="请输入姓名"/>
+        </textarea><br/>
+        <a href="#" id="copy_input2" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【前后效果图对比】</h4>
+        <hr />
+        <table>
+            <tr>
+                <td><img src="../images/2-1.png" class="litu" alt="" aria-labelledby="img1_label"/></td><td><img src="../images/2-2.png" class="litu" alt="" aria-labelledby="img2_label"/></td>
+            </tr>
+            <tr>
+                <td id="img1_label">优化前，屏幕阅读器朗读“编辑框”;</td><td id="img2_label">优化后，屏幕阅读器朗读“编辑框，请输入姓名”;</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h4>【扩展】</h4>
+        <hr />
+        <p></p>
+		<ol><li>
+			android:hint属性中的值会被显示到编辑框中，当用户输入内容之后此属性的显示自动消失。如果觉得此属性显示的文字的颜色与应用程序的整体风格不符，可以使用setHintColor()设置此属性显示的字体的颜色。
+			</li>
+			<li>
+			添加此属性之后编辑框内没有内容的时候屏幕阅读器会朗读此属性，如果编辑框内有内容就朗读内容。如果编辑框是密码类型，用户没有打开辅助功能中的“说出密码功能”的时候此属性不会朗读（TalkBack测试）。
+			</li>
+			<li>如果一个编辑框既然添加了android:hint属性又添加了android:contentDescription属性，屏幕阅读器朗读android:hint属性（TalkBack测试）。
+			</li>
+			<li>如果一个编辑框既添加了Android:hint属性又添加了android:contentDecription属性，想让屏幕阅读器朗读android:contentDescription属性的值，可以吧android:hint的值为空。（TalkBack测试有效）
+			</li>
+		</ol>
+    </div>
+    <div>
+        <h4>【更多】</h4>
+        <hr />
+        <ol></ol>
+    </div>
+</div>
+<!-- body end -->
+
+<!-- footer begin -->
+<div class="footer">
+</div>
+<!-- footer end -->
+</div>
+<!-- wrap end -->
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<title>替代文本应该本地化、描述准确、简明扼要</title>
+<link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.zclip.min.js"></script>
+<script type="text/javascript">
+$(function(){ 
+    $('#copy_input1').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code1').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input2').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code2').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+</script>
+</head>
+<body>
+<div class="wrap">
+<!-- header begin -->
+<div class="header">
+    <div ><a href="http://www.siaa.org.cn/"><img src="../logo.png" alt="信息无障碍研究会"  class="logo"/></a></div>
+    <!-- nav bar begin -->
+    <div class="nav-bar">
+        <!-- nav menu begin -->
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li><a href="../index.html">返回</a></li>
+        </ul>
+        <!-- nav menu end -->
+    </div>
+    <!-- nav bar end -->
+</div>
+<!-- header end -->
+
+<!-- body begin -->
+<div class="body">
+    <h3>替代文本应该本地化、描述准确、简明扼要_____20160506</h3>
+    <hr />
+    <div>
+        <h4>【问题描述】</h4>
+        <hr />
+        <p>如果替代文本没有本地化，会给用户理解控件的功能、目的、传递的信息带来很大困扰。例如：一个图形的播放按钮替代文本是“play”，大多数不懂英文的用户就不知道此按钮的功能是什么。替代文本过长会让用户花大量的时间去听控件的替代文本，影响用户使用产品的效率。如果替代文本描述不准确，会让用户无法很好的使用产品，例如一个播放按钮替代文本是：“搜索歌曲”，会让用户非常困惑。</p><!--问题说明-->
+    </div>
+    <div>
+        <h4>【问题代码】</h4>
+        <hr />
+        <p>下面示例中，头像的替代文本是英文，没有进行本地化处理。</p>
+        <textarea rows="24" cols="120" aria-label="问题代码" id="code1">
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="horizontal">
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="50dp"
+		android:text="李白"/>
+
+	<ImageButton
+		android:layout_width="0dp"
+		android:layout_weight="1"
+		android:layout_height="50dp"
+		android:src="@drawable/libai"
+		android:contentDescription="header"//header（头像），没有进行本汉化。
+		/>
+</LinearLayout>
+
+下面的替代文本是一段英文，用户无法知道代表什么意思
+		android:contentDescription="btn_libai_header"// btn_libai_header作为id使用，但用户无法理解；
+
+下面的替代文本不够简明扼要
+		android:contentDescription="这是李白的头像"//繁琐的文本，会增加用户浏览的成本；
+        </textarea><br/>
+        <a href="#" id="copy_input1" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【问题解决方案描述】</h4>
+        <hr />
+        <p>替代文本与非文本内容呈现相同的目的和信息，替代文本应该是有意义的、本地化的、简明扼要的。展示性图片应提供描述其展示内容的替代文本。当无法使用照片展示的内容作为替代文本时，应提供可以标识图片的信息作为替代文本，如序号、创建日期等。</p>
+    </div>
+    <div>
+        <h4>【解决方案】</h4>
+        <hr />
+		<p>下面的代码替代文本是“头像”，但是如果有很多“头像”的时候用户很难分清楚当前处于哪一个头像。</p>
+        <textarea rows="22" cols="120" aria-label="解决方案代码" id="code2">
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="horizontal">
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="50dp"
+		android:text="李白"/>
+
+	<ImageButton
+		android:layout_width="0dp"
+		android:layout_weight="1"
+		android:layout_height="50dp"
+		android:src="@drawable/libai"
+		android:contentDescription="头像"/>
+</LinearLayout>
+
+下面的代码中的替代文本与旁边的文本一致
+		android:contentDescription="李白"
+下面的替代文本有剪短的描述
+		android:contentDescription="李白 头像"
+        </textarea><br/>
+        <a href="#" id="copy_input2" class="copy">复制内容</a> 
+		<p>注：建议优先采用第2、3两种解决方案。替代文本android:contentDescription属性提供的字符串尽量使用string资源，这样可以更好的产生多国语言的app，上面只是为了更加直观所以没有使用string资源。</p>
+    </div>
+    <div>
+        <h4>【前后效果图对比】</h4>
+        <hr />
+        <table>
+            <tr>
+                <td><img src="../images/16-1.png" class="litu" alt="" aria-labelledby="img1_label"/></td><td><img src="../images/16-2.png" class="litu" alt="" aria-labelledby="img2_label"/></td>
+            </tr>
+            <tr>
+                <td id="img1_label">优化前，屏幕阅读器朗读“header按钮”“btn_libai_header按钮”“这是李白的头像按钮”;</td><td id="img2_label">优化后，屏幕阅读器朗读“头像按钮”“李白按钮”“李白的头像按钮”;</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h4>【扩展】</h4>
+        <hr />
+        <p></p>
+    </div>
+    <div>
+        <h4>【更多】</h4>
+        <hr />
+        <ol></ol>
+    </div>
+</div>
+<!-- body end -->
+
+<!-- footer begin -->
+<div class="footer">
+</div>
+<!-- footer end -->
+</div>
+<!-- wrap end -->
+</body>
+</html>

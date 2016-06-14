@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<title>在Adapter的getView()方法中动态给ListView中的图片设置描述文本</title>
+<link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.zclip.min.js"></script>
+<script type="text/javascript">
+$(function(){ 
+    $('#copy_input1').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code1').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input2').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code2').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input3').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code3').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input4').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code4').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+</script>
+</head>
+<body>
+<div class="wrap">
+<!-- header begin -->
+<div class="header">
+    <div ><a href="http://www.siaa.org.cn/"><img src="../logo.png" alt="信息无障碍研究会"  class="logo"/></a></div>
+    <!-- nav bar begin -->
+    <div class="nav-bar">
+        <!-- nav menu begin -->
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li><a href="../index.html">返回</a></li>
+        </ul>
+        <!-- nav menu end -->
+    </div>
+    <!-- nav bar end -->
+</div>
+<!-- header end -->
+
+<!-- body begin -->
+<div class="body">
+    <h3>在Adapter的getView()方法中动态给ListView中的图片设置描述文本____20160503</h3>
+    <hr />
+    <div>
+        <h4>【问题描述】</h4>
+        <hr />
+        <p>一个ListView采用自定义的item布局且布局中有图片等需要添加Android:contentDescription属性的控件，如果在xml中添加Android:contentDescription属性，那么ListView的每一个item的图形或添加了Android:contentDescription属性的控件朗读的描述都一样，用户无法很好的区分当前处于哪个item。例如一个展示用户的列表每一个item都有用户名、描述、头像，如果头像的图片在xml里面添加了Android:contentDescription=”头像”，那么每一个item的头像都朗读为：”头像“，用户无法很好的区分当前是在哪一个人的头像。</p><!--问题说明-->
+    </div>
+    <div>
+        <h4>【问题代码】</h4>
+        <hr />
+        <p>下面是ListView的item的布局文件，下面的代码中给ImageView添加了android:contentDescription属性。</p>
+		<p>注：MainActivity.java代码和MainActivity布局文件请看"附件1"。</p>
+        <textarea rows="20" cols="120" aria-label="问题代码" id="code1">
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="horizontal"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:descendantFocusability="blocksDescendants">
+	<!-- 定义一个ImageView，用于作为列表项的一部分。 -->
+	<ImageView android:id="@+id/header"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" 
+		android:paddingLeft="10dp"
+		android:focusable="true"
+		android:focusableInTouchMode="true"
+		android:contentDescription="头像"/>
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+		<!-- 定义一个TextView，用于作为列表项的一部分。 -->
+		<TextView android:id="@+id/name"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:textSize="20dp"
+			android:textColor="#f0f"
+			android:paddingLeft="10dp"
+			/>
+		<!-- 定义一个TextView，用于作为列表项的一部分。 -->
+		<TextView android:id="@+id/desc"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:textSize="14dp"
+			android:paddingLeft="10dp"
+			/>
+	</LinearLayout>
+</LinearLayout>
+        </textarea><br/>
+		 <a href="#" id="copy_input1" class="copy">复制内容</a> 
+		<p>下面是继承与BaseAdapter的自定义的Adapter类：</p>
+		<textarea rows="20" cols="120" aria-label="问题代码" id="code2">
+import java.util.List;
+import java.util.Map;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class MyAdapter extends BaseAdapter {
+
+	private LayoutInflater mInflater;// 动态布局映射
+	private List<Map<String, Object>> data;
+	private String[] keys;
+	private int[] ids;
+	private Context context;
+
+	public MyAdapter(Context context, List<Map<String, Object>> data, String[] keys, int[] ids) {
+		this.context = context;
+		this.mInflater = LayoutInflater.from(context);
+		this.data = data;
+		this.keys = keys;
+		this.ids = ids;
+		}
+
+	@Override
+	public int getCount() {
+		return data.size();
+	}
+
+	@Override
+	public Object getItem(int position) {
+		return data.get(position);
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
+
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		convertView = mInflater.inflate(R.layout.list_item, null);//根据布局文件实例化view
+		TextView name = (TextView)convertView.findViewById(ids[0]);
+		name.setText(data.get(position).get(keys[0]).toString());		
+		TextView desc = (TextView) convertView.findViewById(ids[2]);
+		desc.setText(data.get(position).get(keys[2]).toString());
+		final  ImageView head = (ImageView) convertView.findViewById(ids[1]);
+ 		head.setImageResource((Integer) data.get(position).get(keys[1]));
+		head.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+			Toast.makeText(context, head.getContentDescription()+"被单机", Toast.LENGTH_SHORT).show();
+			}
+		});
+			return convertView;
+	}
+
+}
+        </textarea><br/>
+        <a href="#" id="copy_input2" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【问题解决方案描述】</h4>
+        <hr />
+        <p>在ListView绑定的Adapter中的getView()方法中获取到图形(ImageView)或其他要设置android:contentDescription属性的控件的实力用setContentDescription()方法设置此属性。设置的内容尽量与item相关，如展示用户头像的可以设置为用户名+“头像”。</p>
+    </div>
+    <div>
+        <h4>【解决方案】</h4>
+        <hr />
+		<p>下面是ListView的item布局文件，下面的布局虽然设置了android:contentDescription属性，但是后面的Adapter会动态设置此属性把xml中设置的覆盖掉。</p>
+        <textarea rows="20" cols="120" aria-label="解决方案代码" id="code3">
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="horizontal"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:descendantFocusability="blocksDescendants">
+	<!-- 定义一个ImageView，用于作为列表项的一部分。 -->
+	<ImageView android:id="@+id/header"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" 
+		android:paddingLeft="10dp"
+		android:focusable="true"
+		android:focusableInTouchMode="true"
+		android:contentDescription="头像"/>
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+		<!-- 定义一个TextView，用于作为列表项的一部分。 -->
+		<TextView android:id="@+id/name"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:textSize="20dp"
+			android:textColor="#f0f"
+			android:paddingLeft="10dp"
+			/>
+		<!-- 定义一个TextView，用于作为列表项的一部分。 -->
+		<TextView android:id="@+id/desc"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:textSize="14dp"
+			android:paddingLeft="10dp"
+			/>
+	</LinearLayout>
+</LinearLayout>
+        </textarea><br/>
+        <a href="#" id="copy_input3" class="copy">复制内容</a> 
+		<p>下面是继承与BaseAdapter的自定义Adapter，在此类中的getView()方法中动态的设置了android:contentDescription属性，设置的内容与人名关联，用户就能很好知道此图片是展示的什么;</p>
+		<textarea rows="20" cols="120" aria-label="解决方案代码" id="code4">
+import java.util.List;
+import java.util.Map;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class MyAdapter extends BaseAdapter {
+
+	private LayoutInflater mInflater;// 动态布局映射
+	private List<Map<String, Object>> data;
+	private String[] keys;
+	private int[] ids;
+	private Context context;
+	public MyAdapter(Context context, List<Map<String, Object>> data, String[] keys, int[] ids) {
+		this.context = context;
+		this.mInflater = LayoutInflater.from(context);
+		this.data = data;
+		this.keys = keys;
+		ts.ids = ids;
+		}
+	@Override
+	public int getCount() {
+		return data.size();
+	}
+
+	@Override
+	public Object getItem(int position) {
+		return data.get(position);
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
+
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		convertView = mInflater.inflate(R.layout.list_item, null);//根据布局文件实例化view
+		TextView name = (TextView)convertView.findViewById(ids[0]);
+		name.setText(data.get(position).get(keys[0]).toString());
+ 		TextView desc = (TextView) convertView.findViewById(ids[2]);
+ 		desc.setText(data.get(position).get(keys[2]).toString());
+		final  ImageView head = (ImageView) convertView.findViewById(ids[1]);
+		head.setImageResource((Integer) data.get(position).get(keys[1]));
+		head.setContentDescription(data.get(position).get(keys[0])+" 头像");
+
+		head.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Toast.makeText(context, head.getContentDescription()+"被单机", Toast.LENGTH_SHORT).show();
+			}
+		});
+			return convertView;
+	}
+
+}
+        </textarea><br/>
+		 <a href="#" id="copy_input4" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【前后效果图对比】</h4>
+        <hr />
+        <table>
+            <tr>
+                <td><img src="../images/15-1.png" class="litu" alt="" aria-labelledby="img1_label"></td><td><img src="../images/15-2.png" class="litu" alt="" aria-labelledby="img2_label"/></td>
+            </tr>
+            <tr>
+                <td id="img1_label">
+优化前，屏幕阅读器朗读“头像按钮”;</td><td id="img2_label">优化后，屏幕阅读器朗读“弄玉 头像按钮”;</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h4>【扩展】</h4>
+        <hr />
+        <p></p>
+		<a href="15fujian.html">附件1</a>
+    </div>
+    <div>
+        <h4>【更多】</h4>
+        <hr />
+        <ol></ol>
+    </div>
+</div>
+<!-- body end -->
+
+<!-- footer begin -->
+<div class="footer">
+</div>
+<!-- footer end -->
+</div>
+<!-- wrap end -->
+</body>
+</html>

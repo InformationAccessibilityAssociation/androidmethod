@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<title>让以右边的图片作为清除按钮的自定义编辑框的清除按钮支持无障碍的方法</title>
+<link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.zclip.min.js"></script>
+<script type="text/javascript">
+$(function(){ 
+    $('#copy_input1').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code1').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input2').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code2').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input3').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code3').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+</script>
+</head>
+<body>
+<div class="wrap">
+<!-- header begin -->
+<div class="header">
+    <div ><a href="http://www.siaa.org.cn/"><img src="../logo.png" alt="信息无障碍研究会"  class="logo"/></a></div>
+    <!-- nav bar begin -->
+    <div class="nav-bar">
+        <!-- nav menu begin -->
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li><a href="../index.html">返回</a></li>
+        </ul>
+        <!-- nav menu end -->
+    </div>
+    <!-- nav bar end -->
+</div>
+<!-- header end -->
+
+<!-- body begin -->
+<div class="body">
+    <h3>让以右边的图片作为清除按钮的自定义编辑框的清除按钮支持无障碍的方法____20160531</h3>
+    <hr />
+    <div>
+        <h4>【问题描述】</h4>
+        <hr />
+        <p>在编辑框的右边添加一张图片，也就是使用<code>android:drawableRight</code>属性或使用<code>setCompoundDrawables()</code>方法（此方法的第3个参数是右边的图片）。然后判断当触摸的是右边的图片区域的时候就清空编辑框。由于此图片是在编辑框内，所以此图片默认是没有焦点的，所以屏幕阅读器用户无法知道有此功能，更无法操作此图片。</p><!--问题说明-->
+    </div>
+    <div>
+        <h4>【问题代码】</h4>
+        <hr />
+        <p>下面的代码是继承与<code>EditText</code>的一个右边用图片作为清除按钮的自定义编辑框控件。</p><p>
+注：此控件必须设置右边有图片才能正常的显示、响应“清除”的功能。使用此控件的布局代码请参看“<a href="#fujian1">附1</a>“。
+</p>
+        <textarea rows="140" cols="120" aria-label="问题代码" id="code1">
+import java.util.List;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
+import android.support.v4.widget.ExploreByTouchHelper;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.accessibility.AccessibilityEvent;
+import android.view.animation.Animation;
+import android.view.animation.CycleInterpolator;
+import android.view.animation.TranslateAnimation;
+import android.widget.Button;
+import android.widget.EditText;
+import android.util.Log;
+
+public class DeletableEditText extends EditText {
+private Drawable mRightDrawable;
+private boolean isHasFocus;
+public DeletableEditText(Context context) {
+        this(context, null);
+    }
+    public DeletableEditText(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+    public DeletableEditText(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+        init();
+    }
+	private void init() {
+		// getCompoundDrawables:获取组合图片的数组，包括上下左右四个方位
+        Drawable[] drawables = this.getCompoundDrawables();
+
+		// 取得right位置的Drawable
+		// 即我们在布局文件中设置的android:drawableRight
+        mRightDrawable = drawables[2];
+        // 设置焦点变化的监听
+		this.setOnFocusChangeListener(new FocusChangeListenerImpl());
+        // 设置EditText文字变化的监听
+		this.addTextChangedListener(new TextWatcherImpl());
+        // 初始化时让右边clean图标不可见
+        setClearDrawableVisible(false);
+    }
+    /**
+     * 当手指抬起的位置在clean的图标的区域 我们将此视为进行清除操作 </br>
+     * getWidth():得到控件的宽度 </br>
+     * event.getX():抬起时的坐标(改坐标是相对于控件本身而言的) </br>
+     * getTotalPaddingRight():clean的图标左边缘至控件右边缘的距离 </br>
+     * getPaddingRight():clean的图标右边缘至控件右边缘的距离 于是: </br>
+     * getWidth() - getTotalPaddingRight()表示: 控件左边到clean的图标左边缘的区域 </br>
+     * getWidth() - getPaddingRight()表示: 控件左边到clean的图标右边缘的区域 </br>
+     * 所以这两者之间的区域刚好是clean的图标的区域 </br>
+     */
+	@SuppressLint("ClickableViewAccessibility")
+  	  	@Override
+		public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+        case MotionEvent.ACTION_UP:
+            boolean isClean = (event.getX() > (getWidth() - getTotalPaddingRight()))
+                    && (event.getX() < (getWidth() - getPaddingRight()));
+            if (isClean) {
+                setText("");
+            }
+            break;
+
+			default:
+            break;
+        }
+        return super.onTouchEvent(event);
+    }
+    private class FocusChangeListenerImpl implements OnFocusChangeListener {
+		@Override
+		public void onFocusChange(View v, boolean hasFocus) {
+            isHasFocus = hasFocus;
+            if (isHasFocus) {
+                setClearDrawableVisible(getText().toString().length() >= 1);
+            } else {
+                setClearDrawableVisible(false);
+            }
+        }
+
+    }
+    /** 
+    当输入结束后判断是否显示右边clean的图标 
+    */
+	private class TextWatcherImpl implements TextWatcher {
+		@Override
+		public void afterTextChanged(Editable s) {
+            String text = getText().toString();
+            setClearDrawableVisible(text.length() >= 1);
+            //if (text.length() >= 1 && text.trim().length() <= 0) {
+            //    DeletableEditText.this.startAnimation(shakeAnimation(5));
+            //    DeletableEditText.this.setText("");
+            //    setClearDrawableVisible(text.trim().length() >= 1);
+            //}
+
+        }
+        @Override
+		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override 
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+        }
+    }
+    /** 隐藏或者显示右边clean的图标 */
+	protected void setClearDrawableVisible(boolean isVisible) {
+        Drawable rightDrawable;
+        if (isVisible) {
+            rightDrawable = mRightDrawable;
+        } else {
+            rightDrawable = null;
+        }
+        // 使用代码设置该控件left, top, right, and bottom处的图标
+        setCompoundDrawables(getCompoundDrawables()[0], getCompoundDrawables()[1], rightDrawable,
+                getCompoundDrawables()[3]);
+	}
+	public void setTextToNull(){
+		this.setText("");
+	}
+    /** 显示一个动画,以提示用户输入 */
+	public void setShakeAnimation() {
+        this.startAnimation(shakeAnimation(5));
+    }
+    /***
+     * CycleTimes动画重复的次数
+     * 
+     * @param CycleTimes
+     *            重复的次数
+     * @return
+     */
+	public Animation shakeAnimation(int CycleTimes) {
+        Animation translateAnimation = new TranslateAnimation(0, 10, 0, 10);
+        translateAnimation.setInterpolator(new CycleInterpolator(CycleTimes));
+        translateAnimation.setDuration(1000);
+        return translateAnimation;
+		}
+    }
+        </textarea><br/>
+        <a href="#" id="copy_input1" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【问题解决方案描述】</h4>
+        <hr />
+        <p>用v4扩展包里面的<code>ExploreByTouchHelper</code>类给控件中的清除图片添加无障碍虚拟节点，添加虚拟节点之后屏幕阅读器用户的屏幕阅读器可以获得清除图片的焦点并且可以操作此清除图片。添加虚拟节点的方法是首先写一个继承与<code>ExploreByTouchHelper</code>的类，继承<code>ExploreByTouchHelper</code>类必须实现5个方法，分别是：<code>getVirtualViewAt()</code>，此方法通过x、yz坐标来寻找虚拟节点；<code>getVisibleVirtualView()</code>，此方法确定需要显示哪些虚拟节点；<code>onPopulateEventVirtualView()</code>，此方法填充虚拟节点的事件；<code>onPopulateNodeVirtualView()</code>，此方法填充虚拟节点的<code>nodeInfo</code>节点信息；<code>onPerformActionForVirtualView()</code>,响应无障碍事件的操作。在<code>onPopulateNodeVirtualView()</code>方法中必须给<code>nodeInfo</code>节点设置<code>boundsInParent</code>属性和<code>text</code>(或<code>contentDescription</code>)属性，否则程序会崩溃。在自定义视图初始化的时候用<code>ViewCompat.setAccessibilityDelegate()</code>方法（也可以用<code>View.setAccesssibilityDelegate()</code>方法，但是此方法只能在api14以后使用）给视图设置无障碍代理。最后要继承<code>View</code>的<code>dispatchHoverEvent()</code>方法,在此方法中把<code>HoverEvent</code>发送给<code>ExploreByTouchHelper</code>类的无障碍代理。</p>
+    </div>
+    <div>
+        <h4>【解决方案】</h4>
+        <hr />
+		<p>下面的代码实现了右边的清除图片有焦点，能正确朗读，能响应操作。</p>
+        <textarea rows="255" cols="120" aria-label="解决方案代码" id="code2">
+import java.util.List;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
+import android.support.v4.widget.ExploreByTouchHelper;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.accessibility.AccessibilityEvent;
+import android.view.animation.Animation;
+import android.view.animation.CycleInterpolator;
+import android.view.animation.TranslateAnimation;
+import android.widget.Button;
+import android.widget.EditText;
+import android.util.Log;
+
+public class DeletableEditText extends EditText {
+
+private Drawable mRightDrawable;
+private EditTextHelper mHelper;
+private boolean isHasFocus;
+
+public DeletableEditText(Context context) {
+        this(context, null);
+    }
+
+    public DeletableEditText(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    public DeletableEditText(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+        init();
+    }
+
+	private void init() {
+	// getCompoundDrawables:获取组合图片的数组，包括上下左右四个方位
+        Drawable[] drawables = this.getCompoundDrawables();
+        // 取得right位置的Drawable// 即我们在布局文件中设置的android:drawableRight
+        mRightDrawable = drawables[2];
+        // 设置焦点变化的监听
+		this.setOnFocusChangeListener(new FocusChangeListenerImpl());
+        // 设置EditText文字变化的监听
+		this.addTextChangedListener(new TextWatcherImpl());
+        // 初始化时让右边clean图标不可见
+        setClearDrawableVisible(false);
+		//初始化ExploreByTouchHelper
+        mHelper = new EditTextHelper(this);
+		//把ExploreByTouchHelper设置到此控件上，也就是给控件添加无障碍代理(View.AccessibilityDelegate)
+        ViewCompat.setAccessibilityDelegate(this, mHelper);
+    }
+
+	//分发事件
+        @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+        @Override
+        public boolean dispatchHoverEvent(MotionEvent event) {
+            // Always attempt to dispatch hover events to accessibility first.
+            if (mHelper !=null) 
+            if (mHelper.dispatchHoverEvent(event)) {
+                return true;
+            }
+
+            return super.dispatchHoverEvent(event);
+        }
+
+
+    /**
+     * 当手指抬起的位置在clean的图标的区域 我们将此视为进行清除操作 
+     * getWidth():得到控件的宽度 
+     * event.getX():抬起时的坐标(改坐标是相对于控件本身而言的) 
+     * getTotalPaddingRight():clean的图标左边缘至控件右边缘的距离 
+     * getPaddingRight():clean的图标右边缘至控件右边缘的距离 于是: 
+     * getWidth() - getTotalPaddingRight()表示: 控件左边到clean的图标左边缘的区域 
+     * getWidth() - getPaddingRight()表示: 控件左边到clean的图标右边缘的区域 
+     * 所以这两者之间的区域刚好是clean的图标的区域 
+     */
+	@SuppressLint("ClickableViewAccessibility")
+		@Override
+		public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+        case MotionEvent.ACTION_UP:
+            boolean isClean = (event.getX() > (getWidth() - getTotalPaddingRight()))
+                    && (event.getX() < (getWidth() - getPaddingRight()));
+            if (isClean) {
+                setText("");
+            }
+            break;
+
+        default:
+            break;
+        }
+        return super.onTouchEvent(event);
+    }
+
+    private class FocusChangeListenerImpl implements OnFocusChangeListener {
+		@Override
+		public void onFocusChange(View v, boolean hasFocus) {
+            isHasFocus = hasFocus;
+            if (isHasFocus) {
+                setClearDrawableVisible(getText().toString().length() >= 1);
+            } else {
+                setClearDrawableVisible(false);
+            }
+        }
+    }
+
+    /** 
+    当输入结束后判断是否显示右边clean的图标 
+    */
+	private class TextWatcherImpl implements TextWatcher {
+		@Override
+		public void afterTextChanged(Editable s) {
+            String text = getText().toString();
+            setClearDrawableVisible(text.length() >= 1);
+            //if (text.length() >= 1 && text.trim().length() <= 0) {
+            //    DeletableEditText.this.startAnimation(shakeAnimation(5));
+            //    DeletableEditText.this.setText("");
+            //    setClearDrawableVisible(text.trim().length() >= 1);
+            //}
+        }
+
+        @Override
+		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+        @Override 
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+        }
+    }
+
+    /** 隐藏或者显示右边clean的图标 */
+	protected void setClearDrawableVisible(boolean isVisible) {
+        Drawable rightDrawable;
+        if (isVisible) {
+            rightDrawable = mRightDrawable;
+        } else {
+            rightDrawable = null;
+        }
+        // 使用代码设置该控件left, top, right, and bottom处的图标
+        setCompoundDrawables(getCompoundDrawables()[0], getCompoundDrawables()[1], rightDrawable,
+                getCompoundDrawables()[3]);
+		}
+
+	public void setTextToNull(){
+		this.setText("");
+	}
+
+    /** 显示一个动画,以提示用户输入 */
+	public void setShakeAnimation() {
+        this.startAnimation(shakeAnimation(5));
+    }
+
+    /***
+     * CycleTimes动画重复的次数
+     * 
+     * @param CycleTimes
+     *            重复的次数
+     * @return
+     */
+	public Animation shakeAnimation(int CycleTimes) {
+        Animation translateAnimation = new TranslateAnimation(0, 10, 0, 10);
+        translateAnimation.setInterpolator(new CycleInterpolator(CycleTimes));
+        translateAnimation.setDuration(1000);
+        return translateAnimation;
+    }
+
+	//ExploreByTouchHelper类
+        private class EditTextHelper extends ExploreByTouchHelper {
+	//构造函数
+            public EditTextHelper(View forView) {
+                super(forView);
+}
+	//寻找虚拟节点
+        @Override
+        protected int getVirtualViewAt(float x, float y) {
+            final int index;
+			Rect tempRect = new Rect();
+			if (getText().toString().length() >= 1) {
+				tempRect.set(getWidth() - getTotalPaddingRight(), getTop(), getWidth() - getPaddingRight(), getBottom());
+			if (tempRect.contains((int)(x), (int)(y))) {
+				index =0;;
+			}
+			else { 
+				index = ExploreByTouchHelper.INVALID_ID;
+			}
+		}
+		else {
+		index = ExploreByTouchHelper.INVALID_ID;
+		}
+         return index;
+     }
+
+	//要显示的虚拟节点
+    @Override
+    protected void getVisibleVirtualViews(List<Integer> virtualViewIds) {
+        if (getText().toString().length() >= 1) {
+			virtualViewIds.add(0);
+		}
+		else {
+			virtualViewIds.clear();
+		} 
+    }
+	//填充无障碍事件的内容
+    @Override
+    protected void onPopulateEventForVirtualView(
+        int virtualViewId, AccessibilityEvent event) {
+			switch (virtualViewId) {
+			case 0:
+			event.setClassName(Button.class.getName());
+			event.getText().add("清除内容");
+			break;
+			}
+		}
+		//填充无障碍节点的内容
+        @Override
+        protected void onPopulateNodeForVirtualView(
+        int virtualViewId, AccessibilityNodeInfoCompat node) {
+			switch (virtualViewId) {
+				case 0:
+				node.setClassName(Button.class.getName());
+				node.setText("清除内容");
+				//当编辑框的字数不等于0的时候焦点在图片上，编辑框的字数等于0的时候焦点大小不能为空，所以设置为（0，0，1，1）
+			if (getText().toString().length() >= 1)
+				node.setBoundsInParent(new Rect(getWidth() - getTotalPaddingRight(), getTop(), getWidth() - getPaddingRight(), getBottom()));
+			else
+				node.setBoundsInParent(new Rect(0,0,1,1));
+
+			node.setClickable(true);
+            node.addAction(AccessibilityNodeInfoCompat.ACTION_CLICK);
+			break;
+		}
+    }
+	//响应无障碍事件
+    @Override
+    protected boolean onPerformActionForVirtualView(
+        int virtualViewId, int action, Bundle arguments) {
+             Log.i("无障碍", "id"+virtualViewId+"行为"+action+"参数"+arguments.toString());
+			if (virtualViewId == 0 &&action == AccessibilityNodeInfoCompat.ACTION_CLICK) {
+				Log.i("无障碍", "进入删除功能");
+				setTextToNull();
+				mHelper.invalidateVirtualView(virtualViewId);
+				mHelper.sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_CLICKED);
+				return true;
+			} 
+        return false;
+		}
+    }         
+}
+        </textarea><br/>
+        <a href="#" id="copy_input2" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【前后效果图对比】</h4>
+        <hr />
+        <table>
+            <tr>
+                <td><img src="../images/40-1.png" class="litu" alt="" aria-labelledby="img1_label"/></td><td><img src="../images/40-2.png" class="litu" alt="" aria-labelledby="img2_label"/></td>
+            </tr>
+            <tr>
+                <td id="img1_label">优化前，清除按钮无滑动和触摸焦点；</td><td id="img2_label">优化后，清楚按钮有滑动和触摸焦点，聚焦朗读“清除内容 按钮”；</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h4>【扩展】</h4>
+        <hr />
+        <p></p>
+    </div>
+    <div>
+        <h4>【更多】</h4>
+        <hr />
+        <p><a name="fujian1"></a>【附1】使用此自定义扫见使用此自定义控件的布局;</p>
+		 <textarea rows="11" cols="120" aria-label="问题代码" id="code3">
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+	<com.example.android.basicaccessibility.DeletableEditText
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:drawableRight="@drawable/delete"
+		android:hint="输入你的名字"/>
+</LinearLayout>
+		 </textarea><br/>
+        <a href="#" id="copy_input3" class="copy">复制内容</a> 
+    </div>
+</div>
+<!-- body end -->
+<br/>
+<hr/>
+<!-- footer begin -->
+<div class="footer">
+<p class="copyright">深圳市信息无障碍研究会 版权所有.Copyright © 2016 ARA. All 
+Rights Reserved. <a href="http://www.miibeian.gov.cn/" target="_blank">粤ICP备10065437号</a> </p>
+<p class="copyright">地址：深圳市福田区雨田路1号富莲大厦一栋一层</p>
+</div>
+<!-- footer end -->
+</div>
+<!-- wrap end -->
+</body>
+</html>

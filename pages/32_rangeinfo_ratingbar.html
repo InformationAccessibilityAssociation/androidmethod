@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<title>用AccessibilityNodeInfo.RangeInfo使星级评分条（RatingBar）改变值的时候有声音提示</title>
+<link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.zclip.min.js"></script>
+<script type="text/javascript">
+$(function(){ 
+    $('#copy_input1').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code1').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input2').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code2').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input3').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code3').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+</script>
+</head>
+<body>
+<div class="wrap">
+<!-- header begin -->
+<div class="header">
+    <div ><a href="http://www.siaa.org.cn/"><img src="../logo.png" alt="信息无障碍研究会"  class="logo"/></a></div>
+    <!-- nav bar begin -->
+    <div class="nav-bar">
+        <!-- nav menu begin -->
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li><a href="../index.html">返回</a></li>
+        </ul>
+        <!-- nav menu end -->
+    </div>
+    <!-- nav bar end -->
+</div>
+<!-- header end -->
+
+<!-- body begin -->
+<div class="body">
+    <h3>用AccessibilityNodeInfo.RangeInfo使星级评分条（RatingBar）改变值的时候有声音提示____20160525</h3>
+    <hr />
+    <div>
+        <h4>【问题描述】</h4>
+        <hr />
+        <p>Android标准控件的星级评分条（RatingBar）在值改变的时候没有任何提示，用户无法知道当前修改值到什么星级了。</p><!--问题说明-->
+    </div>
+    <div>
+        <h4>【问题代码】</h4>
+        <hr />
+        <p>下面是MainActivity.java的代码，布局文件的代码请参见“<a href="#fujian">附1</a>“。</p>
+        <textarea rows="70" cols="120" aria-label="问题代码" id="code1">
+import android.app.Activity;
+import android.os.Bundle;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.TextView;
+
+public class RadioDemo extends Activity {   
+	private TextView myTextView;  
+	private TextView myTextView2;  
+	private RadioButton Btn1; 
+	private RadioButton Btn2;  
+	private RadioButton Btn3;   
+	private RadioButton Btns1; 
+	private RadioButton Btns2;  
+	private RadioButton Btns3;   
+	private RadioGroup service;    
+	private RadioGroup device;  
+	/** Called when the activity is first created. */    
+	@Override    
+	public void onCreate(Bundle savedInstanceState) {      
+		super.onCreate(savedInstanceState);       
+		setContentView(R.layout.radio);       
+		//通过ID找到TextView       
+		myTextView = (TextView) findViewById(R.id.myTextView);  
+		myTextView2 = (TextView) findViewById(R.id.myTextView2);  
+		//通过ID找到RadioButton      
+		Btn1 = (RadioButton) findViewById(R.id.moto);       
+		Btn2 = (RadioButton) findViewById(R.id.samsung);      
+		Btn3 = (RadioButton) findViewById(R.id.htc);      
+		//通过ID找到RadioGroup      
+		device = (RadioGroup) findViewById(R.id.rBtnGroup_mobile);       
+		//只要对RadioGroup进行监听     
+		device.setOnCheckedChangeListener(new OnCheckedChangeListener() {       
+	        public void onCheckedChanged(RadioGroup group, int checkedId) {  
+			// TODO Auto-generated method stub             
+			if(R.id.moto == checkedId){               
+				myTextView.setText("您选择的设备是：" + Btn1.getText().toString());      }    
+			else if(R.id.samsung == checkedId){             
+				myTextView.setText("您选择的设备是：" + Btn2.getText().toString());    }      
+			else if(R.id.htc == checkedId){   
+				myTextView.setText("您选择的设备是：" + Btn3.getText().toString());     }     
+			}        }); 
+	//通过ID找到RadioButton      
+	Btns1 = (RadioButton) findViewById(R.id.tele);       
+	Btns2 = (RadioButton) findViewById(R.id.mbile);      
+	Btns3 = (RadioButton) findViewById(R.id.unicomm);      
+	//通过ID找到RadioGroup      
+	service = (RadioGroup) findViewById(R.id.rBtnGroup_service);       
+	//只要对RadioGroup进行监听     
+	service.setOnCheckedChangeListener(new OnCheckedChangeListener() {       
+	        public void onCheckedChanged(RadioGroup group, int checkedId) {  
+			// TODO Auto-generated method stub             
+			if(R.id.tele == checkedId){               
+				myTextView2.setText("您选择的运行商是：" + Btns1.getText().toString());      }    
+			else if(R.id.mbile == checkedId){             
+				myTextView2.setText("您选择的运行商是：" + Btns2.getText().toString());    }      
+			else if(R.id.unicomm == checkedId){   
+				myTextView2.setText("您选择的运行商是：" + Btns3.getText().toString());     }     
+			}        }); 
+	}
+}
+        </textarea><br/>
+        <a href="#" id="copy_input1" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【问题解决方案描述】</h4>
+        <hr />
+        <p>利用setAccessibilityDelegate方法给星级评分条(RatingBar)设置AccessibilityDelegate并在此类中重写onInitializeAccessibilityNodeINfo()方法，在onInitializeAccessibilityNodeiNfo()方法中利用AccessibilityNodeINfo.RangeInfo类给添加进度提示。用此方法添加进度提示之后星级评分条的值在改变的时候会发出声音提示，选择的星级越高提示的声音就月高（TalkBack下测试）。<br/>
+		注:
+		</p>
+		<ol>
+		<li>SetAccessibilityDelegate()和View.AccessibilityDelegate要Android api14才支持。可以用支持库v4中的AccessibilityDelegateCompat类和setAccessibilityDelegateCompat()方法支持到Android api4。</li>
+		<li>AccessibilityNodeInfo.RangeInfo类要Android api19才支持，但是可以用支持库v4中的AccessibilityNodeInfoCompat.RangeInfoCompat类支持Android api4。</li>
+		</ol>
+    </div>
+    <div>
+        <h4>【解决方案】</h4>
+        <hr />
+		<p>下面的代码给星级评分条（RatingBar）添加了AccessibilityDelegate。达到的效果是调整星级评分条的值的时候会有声音提示，星级越高，声音越高。</p>
+        <textarea rows="60" cols="120" aria-label="解决方案代码" id="code2">
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.View;
+import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.RatingBar;
+import android.widget.RatingBar.OnRatingBarChangeListener;
+import android.widget.TextView;
+
+public class RatingBarDemo extends Activity {
+private TextView result;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.ratingbar);
+
+		final RatingBar rb1 = (RatingBar) findViewById(R.id.ratingBar1);
+		final RatingBar rb2 = (RatingBar) findViewById(R.id.ratingBar2);
+		final RatingBar rb3 = (RatingBar) findViewById(R.id.ratingBar3);
+		result = (TextView) findViewById(R.id.result);
+		result.setText(getString(R.string.rating1)+ rb1.getRating() +" " +getString(R.string.rating2) + rb2.getRating() + " " +getString(R.string.rating3) + rb3.getRating());
+		//给星级评分条设置AccessibilityDelegate
+		rb1.setAccessibilityDelegate(mDelegate);
+		rb2.setAccessibilityDelegate(mDelegate);
+		rb3.setAccessibilityDelegate(mDelegate);
+
+		OnRatingBarChangeListener orbcl = new OnRatingBarChangeListener() {
+			public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+			//把改变之后的评分结果显示出来
+			result.setText(getString(R.string.rating1)+ rb1.getRating() +" " +getString(R.string.rating2) + rb2.getRating() + " " +getString(R.string.rating3) + rb3.getRating());
+			}
+
+		};
+
+		// 绑定监听器
+		rb1.setOnRatingBarChangeListener(orbcl);
+		rb2.setOnRatingBarChangeListener(orbcl);
+		rb3.setOnRatingBarChangeListener(orbcl);
+	}
+	
+
+	private View.AccessibilityDelegate mDelegate = new View.AccessibilityDelegate() {
+		@Override
+		public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfo info) {
+			super.onInitializeAccessibilityNodeInfo(host, info);
+			//生成AccessibilityNodeInfo.RangeInfo对象
+			AccessibilityNodeInfo.RangeInfo progress = AccessibilityNodeInfo.RangeInfo.obtain(AccessibilityNodeInfo.RangeInfo.RANGE_TYPE_INT, 0, ((RatingBar)host).getNumStars(), ((RatingBar)host).getRating());
+			//把AccessibilityＮｏｄｅＩＮｆｏ．ＲａｎｇｅＩｎｆｏ对象设置到ＡｃｃｅｓｓｉｂｉｌｉｔｙＮｏｄｅＩｎｆｏ中
+			info.setRangeInfo(progress);
+		}
+	};
+}
+        </textarea><br/>
+        <a href="#" id="copy_input2" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【前后效果图对比】</h4>
+        <hr />
+        <table>
+            <tr>
+                <td><img src="../images/32-1.png" class="litu" alt="" aria-labelledby="img1_label"/></td><td><img src="../images/32-1.png" class="litu" alt="" aria-labelledby="img2_label"/></td>
+            </tr>
+            <tr>
+                <td id="img1_label">优化前，聚焦评分条，双指左右拖动，没有音效提示；</td><td id="img2_label">优化前，聚焦评分条，双指左右拖动，有音效提示；</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h4>【扩展】</h4>
+        <hr />
+        <p><a href="../apk/32_apk.apk">最终效果apk</a></p>
+    </div>
+    <div>
+        <h4>【更多】</h4>
+        <hr />
+		<p><a name="fujian"></a>【附1】 MainActivity.xml布局代码</p>
+		<textarea rows="78" cols="120" aria-label="解决方案代码" id="code3">
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" 
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+
+	<TextView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:id="@+id/result"
+		android:text="评分结果"/>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal">
+		<TextView
+			android:id="@+id/textview1"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="发货速度"/>
+
+		<RatingBar 
+			android:id="@+id/ratingBar1"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" 
+			android:rating="3"
+			android:stepSize="1">
+			</RatingBar>
+	</LinearLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal">
+		<TextView
+			android:id="@+id/textview2"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="服务态度"/>
+
+		<RatingBar 
+			android:id="@+id/ratingBar2" 
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" 
+			android:numStars="5"
+			android:rating="4"
+			android:isIndicator="false" 
+			style="?android:attr/ratingBarStyleIndicator"
+			android:layout_marginTop="20dp"
+			android:stepSize="1">
+		</RatingBar>
+	</LinearLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal">
+		<TextView
+			android:id="@+id/textview3"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="产品质量"/>
+
+		<RatingBar 
+			android:id="@+id/ratingBar3" 
+			android:layout_width="wrap_content" 
+			android:numStars="10"
+			android:rating="8"
+			android:isIndicator="false" 
+			android:layout_marginTop="20dp"
+			android:layout_height="wrap_content"
+			android:stepSize="1">
+		</RatingBar>
+	</LinearLayout>
+</LinearLayout>
+		</textarea>
+		 <a href="#" id="copy_input3" class="copy">复制内容</a> 
+    </div>
+</div>
+<!-- body end -->
+
+<!-- footer begin -->
+<div class="footer">
+</div>
+<!-- footer end -->
+</div>
+<!-- wrap end -->
+</body>
+</html>

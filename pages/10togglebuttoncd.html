@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<title>为没有提供textOn、textOff或这两个属性为空字符串的开关控件（ToggleButton）添加描述文本</title>
+<link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.zclip.min.js"></script>
+<script type="text/javascript">
+$(function(){ 
+    $('#copy_input1').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code1').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input2').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code2').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+</script>
+</head>
+<body>
+<div class="wrap">
+<!-- header begin -->
+<div class="header">
+    <div ><a href="http://www.siaa.org.cn/"><img src="../logo.png" alt="信息无障碍研究会"  class="logo"/></a></div>
+    <!-- nav bar begin -->
+    <div class="nav-bar">
+        <!-- nav menu begin -->
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li><a href="../index.html">返回</a></li>
+        </ul>
+        <!-- nav menu end -->
+    </div>
+    <!-- nav bar end -->
+</div>
+<!-- header end -->
+
+<!-- body begin -->
+<div class="body">
+    <h3>为没有提供textOn、textOff或这两个属性为空字符串的开关控件（ToggleButton）添加描述文本____20160423</h3>
+    <hr />
+    <div>
+        <h4>【问题描述】</h4>
+        <hr />
+        <p>开关控件（ToggleButton）有状态提示文本显示，android:textOn属性是当开关开的时候显示，android:textOff是当开关关的时候显示。如果使用开关控件没有另外设置状态提示文本（textOn、textOff）默认显示的是“开”或“关”。如果android:textOn和android:textOff设置为空字符串，无论开关状态是开还是关都不会显示文本。当用户浏览到使用默认状态提示文本的开关控件的时候朗读为“开/开启 开关 已选中”（或“关/关闭 开关 未选中”），用户浏览到textOn和textOff为空字符串的开关的时候，只会朗读”开关 已选中“（或”开关 未选中“）。用户很难通过此提示清楚的了解到此开关是控制什么功能的，只能通过浏览上下文来确定。如果给开关添加了说明文本用户就能很快的知道此开关的功能。</p><!--问题说明-->
+    </div>
+    <div>
+        <h4>【问题代码】</h4>
+        <hr />
+        <p></p>
+        <textarea rows="14" cols="120" aria-label="问题代码" id="code1">
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical">
+	<ToggleButton
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:id="@+id/toggle"/>
+
+	<ToggleButton
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:id="@+id/togglebutton1"
+		android:textOn=""
+		android:textOff=""/>
+</LinearLayout>
+
+        </textarea><br/>
+        <a href="#" id="copy_input1" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【问题解决方案描述】</h4>
+        <hr />
+        <p>在使用开关控件的默认状态文本提示或把textOn和textOff设置为空字符串的时候给开关控件添加Android：contentDescription属性，此属性不会被显示出来，此属性可以帮助用户了解此开关控件的功能、目的。添加了此属性也不会导致不朗读开关控件的状态提示文本不朗读。<br/>
+提示：使用开关控件的时候推荐自己添加状态提示文本，自己添加状态提示文本无障碍体验比添加Android:contentDescription属性好。添加状态提示文本的方式如android:textOff=”关闭消息提醒”、android:textOn=”开启消息提醒”。注意textOn和textOff会显示到控件上。
+</p>
+    </div>
+    <div>
+        <h4>【解决方案】</h4>
+        <hr />
+		<p>下面的代码用android:contentDescription属性给开关添加了说明文本，用户能通过说明文本了解此开关的功能。</p>
+        <textarea rows="14" cols="120" aria-label="解决方案代码" id="code2">
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical">
+	<ToggleButton
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:id="@+id/toggle"
+		android:contentDescription="电灯开关"/>
+
+	<ToggleButton
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:id="@+id/togglebutton1"
+		android:textOn=""
+		android:textOff=""
+		android:contentDescription="电灯开关"/>
+</LinearLayout>
+        </textarea><br/>
+        <a href="#" id="copy_input2" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【前后效果图对比】</h4>
+        <hr />
+        <table>
+            <tr>
+                <td><img src="../images/10-1.png" class="litu" alt="" aria-labelledby="img1_label"/></td><td><img src="../images/10-2.png" class="litu" alt="" aria-labelledby="img2_label"/></td>
+            </tr>
+            <tr>
+                <td id="img1_label">读器朗读：关闭 开关 未选中”或“开启 开关 未选中”；</td><td id="img2_label">TextOn，textOff为空时，聚焦，屏幕阅读器朗读：“开关 已选中”或“开关 未选中”；</td>
+            </tr>
+			<tr>
+                <td><img src="../images/10-3.png" class="litu" alt="" aria-labelledby="img3_label"/></td><td><img src="../images/10-4.png" class="litu" alt="" aria-labelledby="img4_label"/></td>
+            </tr>
+            <tr>
+                <td id="img1_label">添加contentDescription，未设置textOn、textOff， 屏幕阅读器朗读：“电灯开关 开启 开关 已选中”、 “电灯开关 关闭 开关 未选中”</td><td id="img2_label">添加contentDescription，未设置textOn、textOff为空时，双击后，屏幕阅读器朗读：“电灯开关 开关 已选中”、 “电灯开关 关闭 已选中”；</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h4>【扩展】</h4>
+        <hr />
+        <p>Switch控件也可以使用此方法;</p>
+    </div>
+    <div>
+        <h4>【更多】</h4>
+        <hr />
+        <ol></ol>
+    </div>
+</div>
+<!-- body end -->
+
+<!-- footer begin -->
+<div class="footer">
+</div>
+<!-- footer end -->
+</div>
+<!-- wrap end -->
+</body>
+</html>

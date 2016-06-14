@@ -1,0 +1,82 @@
+﻿body{
+align:left;
+margin-left:120px;
+width:900px;
+position: relative;
+}
+.logo{
+width:400px;
+height:100px;
+margin-left:-120px;
+line-height:100px;
+}
+.litu{
+width:300px;
+height:500px;
+}
+table{
+border:solid 1px #cacaca;
+margin:0 100px;
+}
+td{
+border:solid 3px #cacaca;
+width:300px;
+}
+h4{
+font-size:24px;
+margin:40px 0px 0px 0px;
+}
+
+h3{
+font-size:28px;
+margin:40px 0px 20px 0px;
+}
+textarea{
+font-size:18px;
+cols:100;
+width:900px;
+background-color:#f0f0f0;
+border-style:solid;
+
+border-width:1px;
+boder-color:#add9c0;
+}
+p{
+font-size:20px;
+text-indent: 2em;
+
+}
+.line{margin-bottom:20px;}
+.footer .copyright{
+text-align:center;
+font-size:14px;
+color:#cacaca;
+}
+.footer a{
+color:#cacaca;
+}
+code{
+font-size:18px;
+color:#61b3ff;
+}
+.copy{
+line-height:40px;
+margin-top:5px;
+padding:5px 5px 5px 5px;
+border:2px solid #cacaca;
+color:black;
+background:#cacaca;
+text-decoration:none;
+}
+:focus{
+border:2px solid black;
+}
+pre{
+margin-left:10px;
+padding-left:15px;
+padding-top:15px;
+padding-bottom:10px;
+font-size:14px;
+border-left:4px solid #cacaca;
+background:#fafafa;
+}

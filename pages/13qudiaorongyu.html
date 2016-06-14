@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<title>去掉替代文本中的使用提示和冗余信息</title>
+<link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.zclip.min.js"></script>
+<script type="text/javascript">
+$(function(){ 
+    $('#copy_input1').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code1').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input2').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code2').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+</script>
+</head>
+<body>
+<div class="wrap">
+<!-- header begin -->
+<div class="header">
+    <div ><a href="http://www.siaa.org.cn/"><img src="../logo.png" alt="信息无障碍研究会"  class="logo"/></a></div>
+    <!-- nav bar begin -->
+    <div class="nav-bar">
+        <!-- nav menu begin -->
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li><a href="../index.html">返回</a></li>
+        </ul>
+        <!-- nav menu end -->
+    </div>
+    <!-- nav bar end -->
+</div>
+<!-- header end -->
+
+<!-- body begin -->
+<div class="body">
+    <h3>去掉替代文本中的使用提示和冗余信息____20160423</h3>
+    <hr />
+    <div>
+        <h4>【问题描述】</h4>
+        <hr />
+        <p>替代文本中除了有控件的目的、功能之外还有使用提示或冗余信息，屏幕阅读器用户都知道如何操作各类控件，所以在替代文本之中不必添加使用提示。而且屏幕阅读器开启使用提示的时候屏幕阅读器也会朗读出控件的使用方法。</p><!--问题说明-->
+    </div>
+    <div>
+        <h4>【问题代码】</h4>
+        <hr />
+        <p></p>
+        <textarea rows="14" cols="120" aria-label="问题代码" id="code1">
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical">
+<!—下面的图形按钮的替代文本不仅提供了控件的功能而且还提供了使用提示
+	<ImageButton
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:id="@+id/imagebutton"
+		android:src="@drawable/home"
+		android:contentDescription="首页 双击两次进入首页"/>
+</LinearLayout>
+        </textarea><br/>
+        <a href="#" id="copy_input1" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【问题解决方案描述】</h4>
+        <hr />
+        <p>在替代文本之中一般不用添加使用提示，替代文本尽量简明扼要的描述出此控件的功能、目的或所展示的内容，替代文本不能太长。</p>
+    </div>
+    <div>
+        <h4>【解决方案】</h4>
+        <hr />
+        <textarea rows="14" cols="120" aria-label="解决方案代码" id="code2">
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical">
+<!—下面的替代文本简明扼要的表明了此按钮的功能
+	<ImageButton
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:id="@+id/imagebutton"
+		android:src="@drawable/home"
+		android:contentDescription="首页”/>
+</LinearLayout>
+        </textarea><br/>
+        <a href="#" id="copy_input2" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【前后效果图对比】</h4>
+        <hr />
+        <table>
+            <tr>
+                <td><img src="../images/13-1.jpg" class="litu" alt="" aria-labelledby="img1_label"/></td><td><img src="../images/13-2.jpg" class="litu" alt="" aria-labelledby="img2_label"/></td>
+            </tr>
+            <tr>
+                <td id="img1_label">
+优化前，屏幕阅读器朗读“首页 双击两次进入首页按钮” 一秒后，朗读按钮的操作方法；</td><td id="img2_label">优化前，屏幕阅读器朗读“首页按钮” 一秒后，朗读按钮的操作方法；</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h4>【扩展】</h4>
+        <hr />
+        <p></p>
+    </div>
+    <div>
+        <h4>【更多】</h4>
+        <hr />
+        <ol></ol>
+    </div>
+</div>
+<!-- body end -->
+
+<!-- footer begin -->
+<div class="footer">
+</div>
+<!-- footer end -->
+</div>
+<!-- wrap end -->
+</body>
+</html>

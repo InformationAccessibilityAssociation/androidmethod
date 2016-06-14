@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<title>消除浮窗（popupWindow）弹出之后自动把窗口内的所有元素朗读一遍的方法</title>
+<link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.zclip.min.js"></script>
+<script type="text/javascript">
+$(function(){ 
+    $('#copy_input1').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code1').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input2').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code2').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+</script>
+</head>
+<body>
+<div class="wrap">
+<!-- header begin -->
+<div class="header">
+    <div ><a href="http://www.siaa.org.cn/"><img src="../logo.png" alt="信息无障碍研究会"  class="logo"/></a></div>
+    <!-- nav bar begin -->
+    <div class="nav-bar">
+        <!-- nav menu begin -->
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li><a href="../index.html">返回</a></li>
+        </ul>
+        <!-- nav menu end -->
+    </div>
+    <!-- nav bar end -->
+</div>
+<!-- header end -->
+
+<!-- body begin -->
+<div class="body">
+    <h3>消除浮窗（popupWindow）弹出之后自动把窗口内的所有元素朗读一遍的方法____20160526</h3>
+    <hr />
+    <div>
+        <h4>【问题描述】</h4>
+        <hr />
+        <p>当浮窗（PopupWindow）用setFocusable(true)设置为有焦点，且浮窗（PopupWindow）的布局也设置为有焦点（对布局的view设置setFocusable(true)），当浮窗（PopupWindow）弹出之后会把窗口内的所有控件朗读一遍，如本解决方案中的浮窗内的布局中有一个添加替代文本为”java”的图片、有“关闭”、“菜单1“、“菜单2”几个元素，浮窗弹出的时候会朗读“java 关闭 菜单1 菜单2“。</p><!--问题说明-->
+    </div>
+    <div>
+        <h4>【问题代码】</h4>
+        <hr />
+        <p>下面的代码中的浮窗（PopupWindow）设置了焦点且浮窗的布局也设置了焦点，导致浮窗弹出之后会把浮窗内的所有元素朗读一遍。</p>
+		<p>注：主界面的布局请参见“<a href="#fujian1">附1</a>“。浮窗的布局请参见“<a href="#fujian2">附2</a>”。</p>
+        <textarea rows="82" cols="120" aria-label="问题代码" id="code1">
+import android.app.Activity;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.Toast;
+
+public class MainActivity extends Activity
+{
+	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
+		// 装载R.layout.popup对应的界面布局
+		View root = this.getLayoutInflater().inflate(R.layout.popup, null);
+		//给浮窗的布局设置焦点
+		root.setFocusable(true);
+		root.setFocusableInTouchMode(true);
+		// 创建PopupWindow对象
+		final PopupWindow  popup = new PopupWindow(this);
+		//设置浮窗的布局
+		popup.setContentView(root);
+		//设置浮窗的宽度和高度
+		popup.setWidth(LinearLayout.LayoutParams.WRAP_CONTENT);
+		popup.setHeight(LinearLayout.LayoutParams.WRAP_CONTENT);
+		//设置浮窗有焦点
+		popup.setFocusable(true);
+		//设置点击空白区域可以关闭浮窗口
+		popup.setOutsideTouchable(true);
+		//按钮监听器
+		View.OnClickListener ocl = new OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+			switch (v.getId()) {
+			case R.id.bn:
+				//将PopupWindow显示在指定位置
+				popup.showAtLocation(v, Gravity.CENTER, 20,20);
+				break;
+
+			case R.id.close:
+				// 关闭PopupWindow
+				popup.dismiss(); // ①
+				break;
+
+			case R.id.bn1:
+				Toast.makeText(MainActivity.this, "功能1倍单机", Toast.LENGTH_SHORT).show();
+				break;
+			case R.id.bn2:
+				Toast.makeText(MainActivity.this, "功能2倍单机", Toast.LENGTH_SHORT).show();
+				break;
+
+			case R.id.bn3:
+				Toast.makeText(MainActivity.this, "功能3倍单机", Toast.LENGTH_SHORT).show();
+				break;
+
+			case R.id.cd1:
+				Toast.makeText(MainActivity.this, "菜单1倍单机", Toast.LENGTH_SHORT).show();
+				break;
+
+			case R.id.cd2:
+				Toast.makeText(MainActivity.this, "菜单2倍单机", Toast.LENGTH_SHORT).show();
+				break;
+				}
+
+			}
+		};
+	//给按钮添加监听器
+	findViewById(R.id.bn).setOnClickListener(ocl);
+	findViewById(R.id.bn1).setOnClickListener(ocl);
+	root.findViewById(R.id.cd1).setOnClickListener(ocl);
+	findViewById(R.id.bn3).setOnClickListener(ocl);
+	findViewById(R.id.bn2).setOnClickListener(ocl);
+	root.findViewById(R.id.cd2).setOnClickListener(ocl);
+	root.findViewById(R.id.close).setOnClickListener(ocl);
+	}
+}
+        </textarea><br/>
+        <a href="#" id="copy_input1" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【问题解决方案描述】</h4>
+        <hr />
+        <p>当浮窗（PopupWindow）用setFocusable(true)设置了焦点之后，浮窗的布局不要设置焦点。浮窗的布局设置了焦点之后浮窗弹出之后焦点会落在整个界面上，所有屏幕阅读器会把所有元素朗读一遍。</p>
+    </div>
+    <div>
+        <h4>【解决方案】</h4>
+        <hr />
+		<p>下面的代码把给浮窗的布局设置焦点的代码去除了。现在弹出浮窗之后就不会自动朗读浮窗的所有元素了。</p>
+        <textarea rows="80" cols="120" aria-label="解决方案代码" id="code2">
+import android.app.Activity;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.Toast;
+
+public class MainActivity extends Activity
+{
+	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
+		// 装载R.layout.popup对应的界面布局
+		View root = this.getLayoutInflater().inflate(R.layout.popup, null);
+		// 创建PopupWindow对象
+		final PopupWindow  popup = new PopupWindow(this);
+		//设置浮窗的布局
+		popup.setContentView(root);
+		//设置浮窗的宽度和高度
+		popup.setWidth(LinearLayout.LayoutParams.WRAP_CONTENT);
+		popup.setHeight(LinearLayout.LayoutParams.WRAP_CONTENT);
+		//设置浮窗有焦点
+		popup.setFocusable(true);
+		//设置点击空白区域可以关闭浮窗口
+		popup.setOutsideTouchable(true);
+		//按钮监听器
+		View.OnClickListener ocl = new OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+			switch (v.getId()) {
+			case R.id.bn:
+				//将PopupWindow显示在指定位置
+				popup.showAtLocation(v, Gravity.CENTER, 20,20);
+				break;
+
+			case R.id.close:
+				// 关闭PopupWindow
+				popup.dismiss(); // ①
+				break;
+
+			case R.id.bn1:
+				Toast.makeText(MainActivity.this, "功能1倍单机", Toast.LENGTH_SHORT).show();
+				break;
+			case R.id.bn2:
+				Toast.makeText(MainActivity.this, "功能2倍单机", Toast.LENGTH_SHORT).show();
+				break;
+
+			case R.id.bn3:
+				Toast.makeText(MainActivity.this, "功能3倍单机", Toast.LENGTH_SHORT).show();
+				break;
+
+			case R.id.cd1:
+				Toast.makeText(MainActivity.this, "菜单1倍单机", Toast.LENGTH_SHORT).show();
+				break;
+
+			case R.id.cd2:
+				Toast.makeText(MainActivity.this, "菜单2倍单机", Toast.LENGTH_SHORT).show();
+				break;
+				}
+
+			}
+		};
+	//给按钮添加监听器
+	findViewById(R.id.bn).setOnClickListener(ocl);
+	findViewById(R.id.bn1).setOnClickListener(ocl);
+	root.findViewById(R.id.cd1).setOnClickListener(ocl);
+	findViewById(R.id.bn3).setOnClickListener(ocl);		findViewById(R.id.bn2).setOnClickListener(ocl);
+	root.findViewById(R.id.cd2).setOnClickListener(ocl);
+	root.findViewById(R.id.close).setOnClickListener(ocl);
+	}
+}
+        </textarea><br/>
+        <a href="#" id="copy_input2" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【前后效果图对比】</h4>
+        <hr />
+        <table>
+            <tr>
+                <td><img src="../images/35-1.png" class="litu" alt="" aria-labelledby="img1_label"/></td><td><img src="../images/35-2.png" class="litu" alt="" aria-labelledby="img2_label"/></td>
+            </tr>
+            <tr>
+                <td id="img1_label">优化前，双击弹出POPUP窗口按钮，自动朗读“java 关闭 弹出Popup窗口 菜单1 菜单2”；</td><td id="img2_label">优化后，双击弹出POPUP窗口按钮，无自动朗读；</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h4>【扩展】</h4>
+        <hr />
+		<p><a href="../apk/35_apk.apk">问题apk</a></p>
+    </div>
+    <div>
+        <h4>【更多】</h4>
+        <hr />
+		<p><a name="fujian1"></a>【附1】 Main.xml布局文件的代码</p>
+		<textarea rows="30" cols="120" aria-label="解决方案代码" id="code3">
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" 
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:gravity="center_horizontal">
+	<Button android:id="@+id/bn"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="弹出Popup窗口" 
+		/>
+	
+	<Button android:id="@+id/bn1"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="功能1" 
+		/>
+	
+	<Button android:id="@+id/bn2"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="功能2" 
+		/>
+	<Button android:id="@+id/bn3"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="功能3" 
+		/>	
+</LinearLayout>
+        </textarea><br/>
+        <a href="#" id="copy_input3" class="copy">复制内容</a> 
+		<p><a name="fujian2"></a>【附2】 popup.xml布局文件的代码，此代码是浮窗（PopupWindow）的布局。</p>
+		<textarea rows="35" cols="120" aria-label="解决方案代码" id="code4">
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" 
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:gravity="center_horizontal">
+	<ImageView 
+		android:layout_width="240dp"
+		android:layout_height="wrap_content"
+		android:src="@drawable/java"
+		android:contentDescription="java"/>
+	<Button
+		android:id="@+id/close"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="关闭" />
+	
+	<Button 
+		android:id="@+id/bn1"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="弹出Popup窗口" />
+	
+	<Button 
+		android:id="@+id/cd1"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="菜单1" />
+	
+	<Button 
+		android:id="@+id/cd2"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="菜单2" />
+</LinearLayout>
+        </textarea><br/>
+        <a href="#" id="copy_input4" class="copy">复制内容</a> 
+    </div>
+</div>
+<!-- body end -->
+<br/>
+<hr/>
+<!-- footer begin -->
+<div class="footer">
+<p class="copyright">深圳市信息无障碍研究会 版权所有.Copyright © 2016 ARA. All 
+Rights Reserved. <a href="http://www.miibeian.gov.cn/" target="_blank">粤ICP备10065437号</a> </p>
+<p class="copyright">地址：深圳市福田区雨田路1号富莲大厦一栋一层</p>
+</div>
+<!-- footer end -->
+</div>
+<!-- wrap end -->
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<title>不要让替代文本（contentDescription)覆盖原有的文本</title>
+<link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.zclip.min.js"></script>
+<script type="text/javascript">
+$(function(){ 
+    $('#copy_input1').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code1').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input2').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code2').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input3').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code3').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+
+</script>
+</head>
+<body>
+<div class="wrap">
+<!-- header begin -->
+<div class="header">
+    <div ><a href="http://www.siaa.org.cn/"><img src="../logo.png" alt="信息无障碍研究会"  class="logo"/></a></div>
+    <!-- nav bar begin -->
+    <div class="nav-bar">
+        <!-- nav menu begin -->
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li><a href="../index.html">返回</a></li>
+        </ul>
+        <!-- nav menu end -->
+    </div>
+    <!-- nav bar end -->
+</div>
+<!-- header end -->
+
+<!-- body begin -->
+<div class="body">
+    <h3>不要让替代文本（contentDescription)覆盖原有的文本____20160520</h3>
+    <hr />
+    <div>
+        <h4>【问题描述】</h4>
+        <hr />
+        <p>一些标准控件本身已经显示了文本内容且能被屏幕阅读器正确朗读，提供了android:contentDescription属性，此时屏幕阅读器会只朗读此属性而不朗读原来显示的文本。如果android:contentDescription属性的值提供的内容比控件本身的文本内容少会导致用户获取到的信息变少。例如：一个计时器（Chronometer）控件本身显示的有文本且能被屏幕阅读器朗读，如：“00:20”，假如你提供了android:contentDescription属性，属性的内容是“计时器”，那么屏幕阅读器就只朗读“计时器”不会朗读计时器控件上显示的内容，用户就无法知道当前的计时时间了。</p><!--问题说明-->
+    </div>
+    <div>
+        <h4>【问题代码】</h4>
+        <hr />
+        <p>下面的代码中给计时器（Chronometer）控件提供了android:contentDescription属性，属性的值是：“计时器”，导致无论计时到多少，计时器控件获得焦点的时候都朗读为：“计时器”，用户无法清楚的知道计时的时间。</p>
+		<p>注：MainActivity.java的代码请参见：“附1“</p>
+        <textarea rows="18" cols="120" aria-label="问题代码" id="code1">
+<?xml version="1.0" encoding="utf-8"?>
+<divnearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:gravity="center_horizontal">
+	<Chronometer
+		android:id="@+id/test"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textSize="12pt"
+		android:textColor="#ffff0000"
+		android:contentDescription="计时器"/>
+	<Button
+		android:id="@+id/start"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="启动"/>
+</divnearLayout>
+        </textarea><br/>
+        <a href="#" id="copy_input1" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【问题解决方案描述】</h4>
+        <hr />
+        <p>不要给计时器提供android:contentDescritpion属性，或把android:contentDescription属性的值设置为空。因为计时器（Chronometer）控件本身会显示文本且显示的文本能被屏幕阅读器器朗读出，如果提供了android:contentDescription属性屏幕阅读器会朗读此属性而不朗读本身的文本。</p>
+    </div>
+    <div>
+        <h4>【解决方案】</h4>
+        <hr />
+		<p>下面的代码去掉了计时器（Chronometer）控件的android:contentDescription属性，用户能清楚的知道当前计时的时间了。</p>
+        <textarea rows="18" cols="120" aria-label="解决方案代码" id="code2">
+<?xml version="1.0" encoding="utf-8"?>
+<divnearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:gravity="center_horizontal">
+	<Chronometer
+		android:id="@+id/test"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textSize="12pt"
+		android:textColor="#ffff0000"/>
+	<Button
+		android:id="@+id/start"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="启动"/>
+</divnearLayout>
+        </textarea><br/>
+        <a href="#" id="copy_input2" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【前后效果图对比】</h4>
+        <hr />
+        <table>
+            <tr>
+                <td><img src="../images/28-1.png" class="litu" alt="" aria-labelledby="img1_label"/></td><td><img src="../images/28-2.png" class="litu" alt="" aria-labelledby="img2_label"/></td>
+            </tr>
+            <tr>
+                <td id="img1_label">优化前，给计时器添加了android:contentDescription，聚焦时，屏幕阅读器朗读“计时器”；</td><td id="img2_label">优化后，去掉android:contentDescription属性，聚焦时，屏幕阅读器朗读“00:18”，为当前计时器显示的时间；</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h4>【扩展】</h4>
+        <hr />
+        <p></p>
+    </div>
+    <div>
+        <h4>【更多】</h4>
+        <hr />
+		<p>【附件1】MainActivity.java的代码</p>
+		<textarea rows="50" cols="120" aria-label="解决方案代码" id="code3">
+import android.app.Activity;
+import android.os.Bundle;
+import android.os.SystemClock;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Chronometer;
+import static android.widget.Chronometer.OnChronometerTickdivstener; 
+pubdivc class MainActivity extends Activity
+{
+	Chronometer ch;
+	Button start;
+	@Override
+	pubdivc void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
+		// 获取计时器组件
+		ch = (Chronometer) findViewById(R.id.test);
+		// 获取“开始”按钮
+		start = (Button) findViewById(R.id.start);
+		start.setOnCdivckdivstener(new View.OnCdivckdivstener()
+		{
+			@Override
+			pubdivc void onCdivck(View source)
+			{
+				// 设置开始计时时间
+				ch.setBase(SystemClock.elapsedRealtime());
+				// 启动计时器
+				ch.start();
+				start.setEnabled(false);
+			}
+		});// 为Chronometer绑定事件监听器
+		ch.setOnChronometerTickdivstener(new OnChronometerTickdivstener()
+		{
+			@Override
+			pubdivc void onChronometerTick(Chronometer ch)
+			{
+				// 如果从开始计时到现在超过了20s
+				if (SystemClock.elapsedRealtime() - ch.getBase() > 20 * 1000)
+				{
+					ch.stop();
+					start.setEnabled(true);
+				}
+			}
+		});
+	}
+}
+        </textarea><br/>
+        <a href="#" id="copy_input3" class="copy">复制内容</a>
+    </div>
+</div>
+<!-- body end -->
+
+<!-- footer begin -->
+<div class="footer">
+</div>
+<!-- footer end -->
+</div>
+<!-- wrap end -->
+</body>
+</html>

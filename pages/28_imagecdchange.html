@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<title>图片视图（ImageView）展示的图片有变化的时候替代文本随之变化</title>
+<link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.zclip.min.js"></script>
+<script type="text/javascript">
+$(function(){ 
+    $('#copy_input1').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code1').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input2').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code2').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+</script>
+</head>
+<body>
+<div class="wrap">
+<!-- header begin -->
+<div class="header">
+    <div ><a href="http://www.siaa.org.cn/"><img src="../logo.png" alt="信息无障碍研究会"  class="logo"/></a></div>
+    <!-- nav bar begin -->
+    <div class="nav-bar">
+        <!-- nav menu begin -->
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li><a href="../index.html">返回</a></li>
+        </ul>
+        <!-- nav menu end -->
+    </div>
+    <!-- nav bar end -->
+</div>
+<!-- header end -->
+
+<!-- body begin -->
+<div class="body">
+    <h3>图片视图（ImageView）展示的图片有变化的时候替代文本随之变化____20160520</h3>
+    <hr />
+    <div>
+        <h4>【问题描述】</h4>
+        <hr />
+        <p>图片视图（ImageView）展示的图片有变化的时候，如果替代文本没有变化的话，用户无法知道当前图片视图展示的是什么内容，例如，一个图片视图展示了一座双塔，变成其他的，但是替代文本还是“双塔”，用户无法知道图片已经变化了。</p><!--问题说明-->
+    </div>
+    <div>
+        <h4>【问题代码】</h4>
+        <hr />
+        <p>下面的代码中的next按钮的监听事件处理了切换图片的功能，但是没有改变替代文本，用户无法很好的知道图片已经变化。
+ 注：布局文件、替代文本字符串资源的定义请参看“附1”。 </p>
+        <textarea rows="105" cols="120" aria-label="问题代码" id="code1">
+import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.Bundle;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+
+public class MainActivity extends Activity
+{
+	// 定义一个访问图片的数组
+	int[] images = new int[]{
+			R.drawable.lijiang,
+			R.drawable.qiao,
+			R.drawable.shuangta,
+			R.drawable.shui,
+			R.drawable.xiangbi,
+	};
+	// 定义默认显示的图片
+	int currentImg = 2;
+	// 定义图片的初始透明度
+	private int alpha = 255;
+	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
+		final Button plus = (Button) findViewById(R.id.plus);
+		final Button minus = (Button) findViewById(R.id.minus);
+		final ImageView image1 = (ImageView) findViewById(R.id.image1);
+		final ImageView image2 = (ImageView) findViewById(R.id.image2);
+		final Button next = (Button) findViewById(R.id.next);
+		// 定义查看下一张图片的监听器
+		next.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				// 控制ImageView显示下一张图片
+				image1.setImageResource(
+						images[++currentImg % images.length]);
+			}
+		});
+		// 定义改变图片透明度的方法
+		View.OnClickListener listener = new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				if (v == plus)
+				{
+					alpha += 20;
+				}
+				if (v == minus)
+				{
+					alpha -= 20;
+				}
+				if (alpha >= 255)
+				{
+					alpha = 255;
+				}
+				if (alpha <= 0)
+				{
+					alpha = 0;
+				}
+				// 改变图片的透明度
+				image1.setImageAlpha(alpha);
+			}
+		};
+		// 为两个按钮添加监听器
+		plus.setOnClickListener(listener);
+		minus.setOnClickListener(listener);
+		image1.setOnTouchListener(new View.OnTouchListener()
+		{
+			@Override
+			public boolean onTouch(View view, MotionEvent event)
+			{
+				BitmapDrawable bitmapDrawable = (BitmapDrawable) image1
+						.getDrawable();
+				// 获取第一个图片显示框中的位图
+				Bitmap bitmap = bitmapDrawable.getBitmap();
+				System.out.println(bitmap.getWidth());
+				System.out.println(image1.getWidth());
+				// bitmap图片实际大小与第一个ImageView的缩放比例
+				double scale = 1.0 * bitmap.getHeight() / image1.getHeight();
+				// 获取需要显示的图片的开始点
+				int x = (int) (event.getX() * scale);
+				int y = (int) (event.getY() * scale);
+				if (x + 120 > bitmap.getWidth())
+				{
+					x = bitmap.getWidth() - 120;
+				}
+				if (y + 120 > bitmap.getHeight())
+				{
+					y = bitmap.getHeight() - 120;
+				}
+				// 显示图片的指定区域
+				image2.setImageBitmap(Bitmap.createBitmap(bitmap
+					, x, y, 120, 120));
+				image2.setImageAlpha(alpha);
+				return false;
+			}
+		});
+	}
+}
+        </textarea><br/>
+        <a href="#" id="copy_input1" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【问题解决方案描述】</h4>
+        <hr />
+        <p>当展示的图片变化的时候利用视图的setContentDescription()方法动态的设置替代文本，这样替代文本才能和展示的图片匹配。用户才能很好的知道当前展示的什么图片。</p>
+    </div>
+    <div>
+        <h4>【解决方案】</h4>
+        <hr />
+		<p>下面的代码实现了当图片切换之后替代文本也切换，用户才能很好的知道当前显示的是什么图片。</p>
+        <textarea rows="120" cols="120" aria-label="解决方案代码" id="code2">
+import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.Bundle;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+
+public class MainActivity extends Activity
+{
+	// 定义一个访问图片的数组
+	int[] images = new int[]{
+			R.drawable.lijiang,
+			R.drawable.qiao,
+			R.drawable.shuangta,
+			R.drawable.shui,
+			R.drawable.xiangbi,
+	};
+	//给定义的图片数组定义替代文本数组
+	private  int contentDescription[] = new int[] {
+		R.string.lijiang_contentDescription,
+		R.string.qiao_contentDescription,
+		R.string.shuangta_contentDescription,
+		R.string.shui_contentDescription,
+		R.string.xiangbi_contentDescription,
+	};
+	// 定义默认显示的图片
+	int currentImg = 2;
+	// 定义图片的初始透明度
+	private int alpha = 255;
+	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
+		final Button plus = (Button) findViewById(R.id.plus);
+		final Button minus = (Button) findViewById(R.id.minus);
+		final ImageView image1 = (ImageView) findViewById(R.id.image1);
+		final ImageView image2 = (ImageView) findViewById(R.id.image2);
+		final Button next = (Button) findViewById(R.id.next);
+		// 定义查看下一张图片的监听器
+		next.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				// 控制ImageView显示下一张图片
+				image1.setImageResource(
+						images[++currentImg % images.length]);
+						//给当前显示的图片提供替代文本
+						image1.setContentDescription(
+getString(contentDescription[currentImg % contentDescription.length]));
+			}
+		});
+		// 定义改变图片透明度的方法
+		View.OnClickListener listener = new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				if (v == plus)
+				{
+					alpha += 20;
+				}
+				if (v == minus)
+				{
+					alpha -= 20;
+				}
+				if (alpha >= 255)
+				{
+					alpha = 255;
+				}
+				if (alpha <= 0)
+				{
+					alpha = 0;
+				}
+				// 改变图片的透明度
+				image1.setImageAlpha(alpha);
+			}
+		};
+		// 为两个按钮添加监听器
+		plus.setOnClickListener(listener);
+		minus.setOnClickListener(listener);
+		image1.setOnTouchListener(new View.OnTouchListener()
+		{
+			@Override
+			public boolean onTouch(View view, MotionEvent event)
+			{
+				BitmapDrawable bitmapDrawable = (BitmapDrawable) image1
+						.getDrawable();
+				// 获取第一个图片显示框中的位图
+				Bitmap bitmap = bitmapDrawable.getBitmap();
+				System.out.println(bitmap.getWidth());
+				System.out.println(image1.getWidth());
+				// bitmap图片实际大小与第一个ImageView的缩放比例
+				double scale = 1.0 * bitmap.getHeight() / image1.getHeight();
+				// 获取需要显示的图片的开始点
+				int x = (int) (event.getX() * scale);
+				int y = (int) (event.getY() * scale);
+				if (x + 120 > bitmap.getWidth())
+				{
+					x = bitmap.getWidth() - 120;
+				}
+				if (y + 120 > bitmap.getHeight())
+				{
+					y = bitmap.getHeight() - 120;
+				}
+				// 显示图片的指定区域
+				image2.setImageBitmap(Bitmap.createBitmap(bitmap
+					, x, y, 120, 120));
+				image2.setImageAlpha(alpha);
+				return false;
+			}
+		});
+	}
+}
+        </textarea><br/>
+        <a href="#" id="copy_input2" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【前后效果图对比】</h4>
+        <hr />
+        <table>
+            <tr>
+                <td><img src="../images/28-1.png" class="litu" alt="" aria-labelledby="img1_label"/></td><td><img src="../images/28-2.png" class="litu" alt="" aria-labelledby="img2_label"/></td>
+            </tr>
+            <tr>
+                <td id="img1_label">优化前，所有图片聚焦时，朗读“双塔”；</td><td id="img2_label">优化后，图片聚焦时，朗读当前图片的主题，如图所示“象鼻”；</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h4>【扩展】</h4>
+        <hr />
+        <p></p>
+    </div>
+    <div>
+        <h4>【更多】</h4>
+        <hr />
+        <a href="28fujian.html">附件1</a>
+    </div>
+</div>
+<!-- body end -->
+
+<!-- footer begin -->
+<div class="footer">
+</div>
+<!-- footer end -->
+</div>
+<!-- wrap end -->
+</body>
+</html>

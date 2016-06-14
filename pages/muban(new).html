@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<title></title>
+<link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.zclip.min.js"></script>
+<script type="text/javascript">
+$(function(){ 
+    $('#copy_input1').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code1').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input2').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code2').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+/*
+$(function(){ 
+    $('#copy_input3').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code3').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+*/
+</script>
+</head>
+<body>
+<div class="wrap">
+<!-- header begin -->
+<div class="header">
+    <div ><a href="http://www.siaa.org.cn/"><img src="../logo.png" alt="信息无障碍研究会"  class="logo"/></a></div>
+    <!-- nav bar begin -->
+    <div class="nav-bar">
+        <!-- nav menu begin -->
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li><a href="../index.html">返回</a></li>
+        </ul>
+        <!-- nav menu end -->
+    </div>
+    <!-- nav bar end -->
+</div>
+<!-- header end -->
+
+<!-- body begin -->
+<div class="body">
+    <h3  ></h3>
+    <hr />
+    <div>
+        <h4  >【问题描述】</h4>
+        <hr />
+        <p></p><!--问题说明-->
+    </div>
+    <div>
+        <h4  >【问题代码】</h4>
+        <hr />
+        <p></p>
+        <textarea rows="14" cols="120" aria-label="问题代码" id="code1">
+
+        </textarea><br/>
+        <a href="#" id="copy_input1" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4  >【问题解决方案描述】</h4>
+        <hr />
+        <p></p>
+    </div>
+    <div>
+        <h4  >【解决方案】</h4>
+        <hr />
+		<p></p>
+        <textarea rows="14" cols="120" aria-label="解决方案代码" id="code2">
+
+        </textarea><br/>
+        <a href="#" id="copy_input2" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4  >【前后效果图对比】</h4>
+        <hr />
+        <table>
+            <tr>
+                <td><img src="../images/" class="litu" alt="" aria-labelledby="img1_label"/></td><td><img src="../images/" class="litu" alt="" aria-labelledby="img2_label"/></td>
+            </tr>
+            <tr>
+                <td id="img1_label"></td><td id="img2_label"></td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h4  >【扩展】</h4>
+        <hr />
+        <p></p>
+    </div>
+    <div>
+        <h4  >【更多】</h4>
+        <hr />
+        <p></p>
+		<!--
+		<textarea rows="14" cols="120" aria-label="解决方案代码" id="code3">
+
+        </textarea><br/>
+        <a href="#" id="copy_input3" class="copy">复制内容</a> 
+		-->
+    </div>
+</div>
+<!-- body end -->
+<br/>
+<hr/>
+<!-- footer begin -->
+<div class="footer">
+<p class="copyright">深圳市信息无障碍研究会 版权所有.Copyright © 2016 ARA. All 
+Rights Reserved. <a href="http://www.miibeian.gov.cn/" target="_blank">粤ICP备10065437号</a> </p>
+<p class="copyright">地址：深圳市福田区雨田路1号富莲大厦一栋一层</p>
+</div>
+<!-- footer end -->
+</div>
+<!-- wrap end -->
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<title>去掉大焦点</title>
+<link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.zclip.min.js"></script>
+<script type="text/javascript">
+$(function(){ 
+    $('#copy_input1').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code1').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input2').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code2').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input3').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code3').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+</script>
+</head>
+<body>
+<div class="wrap">
+<!-- header begin -->
+<div class="header">
+    <div ><a href="http://www.siaa.org.cn/"><img src="../logo.png" alt="信息无障碍研究会"  class="logo"/></a></div>
+    <!-- nav bar begin -->
+    <div class="nav-bar">
+        <!-- nav menu begin -->
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li><a href="../index.html">返回</a></li>
+        </ul>
+        <!-- nav menu end -->
+    </div>
+    <!-- nav bar end -->
+</div>
+<!-- header end -->
+
+<!-- body begin -->
+<div class="body">
+    <h3>去掉大焦点____2016</h3>
+    <hr />
+    <div>
+        <h4>【问题描述】</h4>
+        <hr />
+        <p>大焦点是一个焦点覆盖了多个视图或控件，当这个大焦点获得焦点的时候会把此焦点锁覆盖的控件部分或全部朗读出来，让用户无法很好的理解整个布局所提供的信息。有一些大焦点单指双击会响应事件，但是响应的事件很难确定是此焦点下的哪个视图或控件的响应事件。</p><!--问题说明-->
+    </div>
+    <div>
+        <h4>【问题代码】</h4>
+        <hr />
+        <p></p>
+        <textarea rows="60" cols="120" aria-label="问题代码" id="code1">
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	<!—下面的属性只要提供任意一个都会产生大焦点-->
+	Android:focusable="true"
+	android:focusableInTouchMode="true">
+
+<TextView
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="20dp"
+	android:paddingLeft="10dp"
+	android:text="修改个人资料"/>
+
+<TextView
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="14dp"
+	android:paddingLeft="10dp"
+	android:text="姓名"/>
+
+<Button android:id="@+id/name"
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="14dp"
+	android:paddingLeft="10dp"
+	android:text="姓名"/>
+
+<TextView
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="14dp"
+	android:paddingLeft="10dp"
+	android:text="性别"/>
+
+<Button android:id="@+id/sex"
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="14dp"
+	android:paddingLeft="10dp"
+	android:text="性别"/>
+
+<TextView
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="14dp"
+	android:paddingLeft="10dp"
+	android:text="年龄"/>
+
+<Button android:id="@+id/age"
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="14dp"
+	android:paddingLeft="10dp"
+	android:text="年龄"/>
+</LinearLayout>
+
+
+        </textarea><br/>
+        <a href="#" id="copy_input1" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【问题解决方案描述】</h4>
+        <hr/><p>导致此问题出现的原因是父视图获得了焦点，父视图获得焦点之后，就会把此视图之中默认没有焦点的控件合并为一个大焦点并朗读出来。一种解决方法就是让父视图失去焦点，也就是不要给父试图提供android:focusable和android:focusableInTouchMode之中的任意一个属性。另外一种解决方法是把父视图中的那些默认没有焦点的控件（如:TextView）添加上焦点，就是添加上android:focusable、android:focusableInTouchMode两个属性。</p>
+    </div>
+    <div>
+        <h4>【解决方案】</h4>
+        <hr />
+		<p>方案1：下面的代码把父视图的焦点去掉了，也就是把android:focusable和android:focusableInTouchMode属性去掉了。</p>
+        <textarea rows="54" cols="120" aria-label="解决方案代码1" id="code2">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content">
+
+<TextView
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="20dp"
+	android:paddingLeft="10dp"
+	android:text="修改个人资料"/>
+
+<TextView
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="14dp"
+	android:paddingLeft="10dp"
+	android:text="姓名"/>
+
+<Button android:id="@+id/name"
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="14dp"
+	android:paddingLeft="10dp"
+	android:text="姓名"/>
+
+<TextView
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="14dp"
+	android:paddingLeft="10dp"
+	android:text="性别"/>
+
+<Button android:id="@+id/sex"
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="14dp"
+	android:paddingLeft="10dp"
+	android:text="性别"/>
+
+<TextView
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="14dp"
+	android:paddingLeft="10dp"
+	android:text="年龄"/>
+
+<Button android:id="@+id/age"
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="14dp"
+	android:paddingLeft="10dp"
+	android:text="年龄"/>
+</LinearLayout>
+
+        </textarea><br/>
+        <a href="#" id="copy_input2" class="copy">复制内容</a> 
+		<p>方案2： 把试图中默认没有焦点的控件加上焦点，下面的布局中把所有的TextView都加上了焦点.</p>
+		<textarea rows="65" cols="120" aria-label="解决方案代码2"  id="code3">
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout 	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:focusable="true"
+	android:focusableInTouchMode="true"&gt;
+
+&lt;TextView
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="20dp"
+	android:paddingLeft="10dp"
+	android:text="修改个人资料"
+	android:focusable="true"
+	android:focusableInTouchMode="true"/&gt;
+
+&lt;TextView
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="14dp"
+	android:paddingLeft="10dp"
+	android:text="姓名"
+	android:focusable="true"
+	android:focusableInTouchMode="true"/&gt;
+
+&lt;Button android:id="@+id/name"
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="14dp"
+	android:paddingLeft="10dp"
+	android:text="姓名"/&gt;
+
+&lt;TextView
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="14dp"
+	android:paddingLeft="10dp"
+	android:text="性别"
+	android:focusable="true"
+	android:focusableInTouchMode="true"/&gt;
+
+&lt;Button android:id="@+id/sex"
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="14dp"
+	android:paddingLeft="10dp"
+	android:text="性别"/&gt;
+
+&lt;TextView
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="14dp"
+	android:paddingLeft="10dp"
+	android:text="年龄"
+	android:focusable="true"
+	android:focusableInTouchMode="true"/&gt;
+
+&lt;Button android:id="@+id/age"
+	android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"
+	android:textSize="14dp"
+	android:paddingLeft="10dp"
+	android:text="年龄"/&gt;
+&lt;/LinearLayout&gt;
+</textarea>
+<a href="#" id="copy_input3" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【前后效果图对比】</h4>
+        <hr />
+        <table>
+            <tr>
+                <td><img src="../images/18-1.png" class="litu" alt="" aria-labelledby="img1_label"/></td><td><img src="../images/18-2.png" class="litu" alt="" aria-labelledby="img2_label"/></td>
+            </tr>
+            <tr>
+                <td id="img1_label">优化前，有一个大焦点，屏幕阅读器朗读"修改个人资料，姓名，性别，年龄";</td><td id="img2_label">优化后，每个元素都有独立的焦点；</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h4>【扩展】</h4>
+        <hr />
+        <p></p>
+    </div>
+    <div>
+        <h4>【更多】</h4>
+        <hr />
+        <ol></ol>
+    </div>
+</div>
+<!-- body end -->
+
+<!-- footer begin -->
+<div class="footer">
+</div>
+<!-- footer end -->
+</div>
+<!-- wrap end -->
+</body>
+</html>

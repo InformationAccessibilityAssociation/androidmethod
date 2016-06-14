@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<title>因控件过小导致的按钮响应事件错乱或不响应的解决方案</title>
+<link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.zclip.min.js"></script>
+<script type="text/javascript">
+$(function(){ 
+    $('#copy_input1').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code1').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input2').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code2').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+</script>
+</head>
+<body>
+<div class="wrap">
+<!-- header begin -->
+<div class="header">
+    <div ><a href="http://www.siaa.org.cn/"><img src="../logo.png" alt="信息无障碍研究会"  class="logo"/></a></div>
+    <!-- nav bar begin -->
+    <div class="nav-bar">
+        <!-- nav menu begin -->
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li><a href="../index.html">返回</a></li>
+        </ul>
+        <!-- nav menu end -->
+    </div>
+    <!-- nav bar end -->
+</div>
+<!-- header end -->
+
+<!-- body begin -->
+<div class="body">
+    <h3>因控件过小导致的按钮响应事件错乱或不响应的解决方案____20160412</h3>
+    <hr />
+    <div>
+        <h4>【问题描述】</h4>
+        <hr />
+        <p>在一个界面上有多个按钮相邻，且按钮都监听了onClick事件。由于控件过小导致单指双击一个按钮响应的却是另一个按钮的点击事件或不响应。如该解决方案中的例子所示，单机最下面的图片按钮响应的确是图片按钮上面的那个按钮的事件。<br/>
+注：此问题产生的情况是如下:<br/>
+1、	导入了一个没有在manifest文件中写最低版本（<uses-sdk>元素的android:minSdkVersion属性）的工程；<br/>
+2、	整个界面上在垂直方向上有多个按钮且都添加了监听事件（详见下面的代码）；<br/>
+</p><!--问题说明-->
+    </div>
+    <div>
+        <h4>【问题代码】</h4>
+        <hr />
+        <p>下面是出现问题的布局界面的代码，MainActivity.java的代码请参看“附1”：</p>
+        <textarea rows="14" cols="120" aria-label="问题代码" id="code1">
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" 
+	android:gravity="center"
+	android:layout_width="fill_parent" 
+	android:layout_height="fill_parent">
+	<TextView 
+		android:text="你喜欢的手机品牌是？" android:id="@+id/TextView01"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+	<Button 
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" 
+		android:text="三星"
+		android:background="@drawable/btn_background"
+		android:onClick="onClick" 
+		android:id="@+id/Button02"></Button>
+	<Button 
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" 
+		android:text="摩托"
+		android:onClick="onClick" 
+		android:id="@+id/Button03"></Button>
+	<Button 
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" 
+		android:text="HTC"
+		android:onClick="onClick" 
+		android:id="@+id/Button01"></Button>
+</LinearLayout>
+        </textarea><br/>
+        <a href="#" id="copy_input1" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【问题解决方案描述】</h4>
+        <hr />
+        <p>可触控制区域大小：官方推荐，用户可选择或者操作区域最小长度和宽度为48dp大小。经过测试把此布局文件的按钮的高度改高一些就能正常的响应按钮的单指双击事件。</p>
+    </div>
+    <div>
+        <h4>【解决方案】</h4>
+        <hr />
+		<p>下面的代码吧按钮的高度修改了，高度修改之后按钮就能正常的响应单指双击事件;</p>
+        <textarea rows="14" cols="120" aria-label="解决方案代码" id="code2">
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" 
+	android:gravity="center"
+	android:layout_width="fill_parent" 
+	android:layout_height="fill_parent">
+	<TextView 
+		android:text="你喜欢的手机品牌是？" android:id="@+id/TextView01"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+	<Button 
+		android:layout_width="wrap_content"
+		android:layout_height="80dp” android:text="三星"
+		android:background="@drawable/btn_background"
+		android:onClick="onClick" 
+		android:id="@+id/Button02"></Button>
+	<Button 
+		android:layout_width="wrap_content"
+		android:layout_height="80dp” android:text="摩托"
+		android:onClick="onClick" 
+		android:id="@+id/Button03"></Button>
+	<Button 
+		android:layout_width="wrap_content"
+		android:layout_height="80dp” 
+		android:text="HTC"
+		android:onClick="onClick" 
+		android:id="@+id/Button01"></Button>
+</LinearLayout>
+        </textarea><br/>
+        <a href="#" id="copy_input2" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【前后效果图对比】</h4>
+        <hr />
+        <table>
+            <tr>
+                <td><img src="../images/5-1.png" class="litu" alt="" aria-labelledby="img1_label"/></td><td><img src="../images/5-2.png" class="litu" alt="" aria-labelledby="img2_label"/></td>
+            </tr>
+            <tr>
+                <td id="img1_label">优化前，按钮响应相同的点击事件;</td><td id="img2_label">优化后，按钮响应不同的点击事件;</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h4>【扩展】</h4>
+        <hr />
+        <p>此解决方法不一定生效。也许还有其他原因引起此问题，暂时还没有发现。</p>
+    </div>
+    <div>
+        <h4>【更多】</h4>
+        <hr />
+		<a href="5fujian.html">附件1</a>
+        <ol></ol>
+    </div>
+</div>
+<!-- body end -->
+
+<!-- footer begin -->
+<div class="footer">
+</div>
+<!-- footer end -->
+</div>
+<!-- wrap end -->
+</body>
+</html>

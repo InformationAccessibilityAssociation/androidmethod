@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<title>屏蔽浮窗的底层焦点（屏蔽之后不能对浮窗以外的元素进行操作）</title>
+<link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.zclip.min.js"></script>
+<script type="text/javascript">
+$(function(){ 
+    $('#copy_input1').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code1').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input2').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code2').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+}); 
+$(function(){ 
+    $('#copy_input3').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code3').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+});
+$(function(){ 
+    $('#copy_input4').zclip({ 
+        path: 'js/ZeroClipboard.swf', 
+        copy: function(){//复制内容 
+            return $('#code4').val(); 
+        }, 
+        afterCopy: function(){//复制成功 
+            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
+        } 
+    }); 
+});
+</script>
+</head>
+<body>
+<div class="wrap">
+<!-- header begin -->
+<div class="header">
+    <div ><a href="http://www.siaa.org.cn/"><img src="../logo.png" alt="信息无障碍研究会"  class="logo"/></a></div>
+    <!-- nav bar begin -->
+    <div class="nav-bar">
+        <!-- nav menu begin -->
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li><a href="../index.html">返回</a></li>
+        </ul>
+        <!-- nav menu end -->
+    </div>
+    <!-- nav bar end -->
+</div>
+<!-- header end -->
+
+<!-- body begin -->
+<div class="body">
+    <h3>屏蔽浮窗的底层焦点（屏蔽之后不能对浮窗以外的元素进行操作）____20160527</h3>
+    <hr />
+    <div>
+        <h4>【问题描述】</h4>
+        <hr />
+        <p>当浮窗弹出之后用户滑动或触摸浏览的时候能浏览到被浮窗覆盖的元素，用户会以为这些元素是可以操作的，但是实际上这些元素是不可以操作的。这样会给用户操作应用带来一些困扰。</p><!--问题说明-->
+    </div>
+    <div>
+        <h4>【问题代码】</h4>
+        <hr />
+        <p>下面的代码实现了点击最上面的按钮会弹出一个浮窗。这个浮窗会覆盖底层的按钮，但是滑动浏览的时候底层的按钮还是能浏览到。</p>
+		<p>注意：MainActivity.xml布局代码请参见“<a href="#fujian1">附1</a>“、popup.xml布局代码请参见“<a href="#fujian2">附2</a>”。</p>
+        <textarea rows="65" cols="120" aria-label="问题代码" id="code1">
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.Toast;
+
+public class MainActivity extends Activity
+{
+	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
+		// 装载R.layout.popup对应的界面布局
+		View root = this.getLayoutInflater().inflate(R.layout.popup, null);
+		// 创建PopupWindow对象
+		final PopupWindow  popup = new PopupWindow(this);
+		//设置浮窗的布局
+		popup.setContentView(root);
+		//设置浮窗的宽度和高度
+		popup.setWidth(LinearLayout.LayoutParams.WRAP_CONTENT);
+		popup.setHeight(LinearLayout.LayoutParams.WRAP_CONTENT);
+		//设置浮窗没有焦点
+		popup.setFocusable(false);
+		//设置点击空白区域可以关闭浮窗
+		popup.setOutsideTouchable(true);
+		//按钮监听器
+		View.OnClickListener ocl = new OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+			switch (v.getId()) {
+			case R.id.bn:
+				//将PopupWindow显示在指定位置
+				popup.showAtLocation(v, Gravity.CENTER, -200,-200);
+				break;
+			case R.id.close:
+				// 关闭PopupWindow
+				popup.dismiss(); // ①
+				break;
+
+			default:
+				Toast.makeText(MainActivity.this, ((Button)v).getText().toString() +"倍单机", Toast.LENGTH_SHORT).show();
+				}
+
+			}
+		};
+		//给按钮添加监听器
+		findViewById(R.id.bn).setOnClickListener(ocl);
+		findViewById(R.id.bn1).setOnClickListener(ocl);
+		findViewById(R.id.bn2).setOnClickListener(ocl);
+		root.findViewById(R.id.cd1).setOnClickListener(ocl);
+		root.findViewById(R.id.cd2).setOnClickListener(ocl);
+		root.findViewById(R.id.close).setOnClickListener(ocl);
+	}
+}
+        </textarea><br/>
+        <a href="#" id="copy_input1" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【问题解决方案描述】</h4>
+        <hr />
+        <p><code>PopupWindow</code>类有一个方法是<code>setFocusable()</code>，这个方法用于设置<code>PopupWindow</code>是否有焦点，当<code>PopupWindow</code>有焦点的时候（也就是<code>setFocusable(true)</code>的时候）用户无法滑动或触摸浏览到被<code>PopupWindow</code>覆盖的元素。请注意设置了此属性之后无法与<code>PopupWindow</code>区域之外的元素进行交互。</p>
+    </div>
+    <div>
+        <h4>【解决方案】</h4>
+        <hr />
+		<p>下面的代码利用<code>setFocusable(true)</code>这行代码把<code>PopupWindow</code>设置为有焦点，这样屏幕阅读器用户就不能浏览到被浮窗覆盖的元素了。注意这样做之后无法与浮窗之外的区域中的元素进行交互。</p>
+        <textarea rows="63" cols="120" aria-label="解决方案代码" id="code2">
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.Toast;
+
+public class MainActivity extends Activity
+{
+	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
+		// 装载R.layout.popup对应的界面布局
+		View root = this.getLayoutInflater().inflate(R.layout.popup, null);
+		// 创建PopupWindow对象
+		final PopupWindow  popup = new PopupWindow(this);
+		//设置浮窗的布局
+		popup.setContentView(root);
+		//设置浮窗的宽度和高度
+		popup.setWidth(LinearLayout.LayoutParams.WRAP_CONTENT);
+		popup.setHeight(LinearLayout.LayoutParams.WRAP_CONTENT);
+		//设置浮窗有焦点
+		popup.setFocusable(true);
+		//设置点击空白区域可以关闭浮窗
+		popup.setOutsideTouchable(true);
+		//按钮监听器
+		View.OnClickListener ocl = new OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+			switch (v.getId()) {
+			case R.id.bn:
+				//将PopupWindow显示在指定位置
+				popup.showAtLocation(v, Gravity.CENTER, -200,-200);
+				break;
+
+			case R.id.close:
+				// 关闭PopupWindow
+				popup.dismiss(); // ①
+				break;
+
+			default:
+				Toast.makeText(MainActivity.this, ((Button)v).getText().toString() +"倍单机", Toast.LENGTH_SHORT).show();
+				}
+
+			}
+		};
+		//给按钮添加监听器
+		findViewById(R.id.bn).setOnClickListener(ocl);
+		findViewById(R.id.bn1).setOnClickListener(ocl);
+		findViewById(R.id.bn2).setOnClickListener(ocl);
+		root.findViewById(R.id.cd1).setOnClickListener(ocl);
+		root.findViewById(R.id.cd2).setOnClickListener(ocl);
+		root.findViewById(R.id.close).setOnClickListener(ocl);
+	}
+}
+        </textarea><br/>
+        <a href="#" id="copy_input2" class="copy">复制内容</a> 
+    </div>
+    <div>
+        <h4>【前后效果图对比】</h4>
+        <hr />
+        <table>
+            <tr>
+                <td><img src="../images/36-1.png" class="litu" alt="" aria-labelledby="img1_label"/></td><td><img src="../images/36-2.png" class="litu" alt="" aria-labelledby="img2_label"/></td>
+            </tr>
+            <tr>
+                <td id="img1_label">优化前，双击“弹出POPUP窗口”按钮，弹出浮窗，向右滑动浏览，可遍历到底层焦点；</td><td id="img2_label">优化后，双击“弹出POPUP窗口”按钮，弹出浮窗，向右滑动浏览，聚焦浮窗内元素；</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h4>【扩展】</h4>
+        <hr />
+        <p></p>
+    </div>
+    <div>
+        <h4>【更多】</h4>
+        <hr />
+		<p><a name="fujian1">【附1】 MainActivity.xml布局代码</a></p>
+		<textarea rows="22" cols="120" aria-label="解决方案代码" id="code3">
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" 
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:gravity="center_horizontal">
+	<Button android:id="@+id/bn"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="弹出Popup窗口" 
+		/>
+	
+	<Button android:id="@+id/bn1"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="功能1" 
+		/>
+		
+	<Button android:id="@+id/bn2"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="功能2" 
+		/>
+</LinearLayout>
+        </textarea><br/>
+        <a href="#" id="copy_input3" class="copy">复制内容</a>
+		<p><a name="fujian2">【附2】 popup.xml布局代码</a></p>
+		<textarea rows="40" cols="120" aria-label="解决方案代码" id="code4">
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+	xmlns:android="	http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" 
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:gravity="center_horizontal">
+	<ImageView 
+		android:layout_width="240dp"
+		android:layout_height="wrap_content"
+		android:src="@drawable/java"
+		android:contentDescription="java"/>
+
+	<Button
+		android:id="@+id/close"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="关闭" 
+		/>
+	
+	<Button android:id="@+id/bn1"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="弹出Popup窗口" 
+		/>
+	
+	<Button android:id="@+id/cd1"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="菜单1" 
+		/>
+	
+	<Button android:id="@+id/cd2"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="菜单2" 
+		/>
+</LinearLayout>
+        </textarea><br/>
+        <a href="#" id="copy_input4" class="copy">复制内容</a>
+    </div>
+</div>
+<!-- body end -->
+<br/>
+<hr/>
+<!-- footer begin -->
+<div class="footer">
+<p class="copyright">深圳市信息无障碍研究会 版权所有.Copyright © 2016 ARA. All 
+Rights Reserved. <a href="http://www.miibeian.gov.cn/" target="_blank">粤ICP备10065437号</a> </p>
+<p class="copyright">地址：深圳市福田区雨田路1号富莲大厦一栋一层</p>
+</div>
+<!-- footer end -->
+</div>
+<!-- wrap end -->
+</body>
+</html>
