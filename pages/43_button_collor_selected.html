@@ -8,28 +8,7 @@
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/jquery.zclip.min.js"></script>
 <script type="text/javascript">
-$(function(){ 
-    $('#copy_input1').zclip({ 
-        path: 'js/ZeroClipboard.swf', 
-        copy: function(){//复制内容 
-            return $('#code1').val(); 
-        }, 
-        afterCopy: function(){//复制成功 
-            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
-        } 
-    }); 
-}); 
-$(function(){ 
-    $('#copy_input2').zclip({ 
-        path: 'js/ZeroClipboard.swf', 
-        copy: function(){//复制内容 
-            return $('#code2').val(); 
-        }, 
-        afterCopy: function(){//复制成功 
-            $("<span id='msg'/>").insertAfter($('#copy_input')).text('复制成功'); 
-        } 
-    }); 
-}); 
+
 
 $(function(){ 
     $('#copy_input3').zclip({ 
@@ -112,7 +91,6 @@ public class MainActivity extends Activity
 }
 </pre>
         <!--</textarea>--><br/>
-        <a href="#" id="copy_input1" class="copy">复制内容</a> 
     </div>
     <div>
         <h4  >【问题解决方案描述】</h4>
@@ -174,7 +152,6 @@ public class MainActivity extends Activity
 }
 </pre>
        <!-- </textarea>--><br/>
-        <a href="#" id="copy_input2" class="copy">复制内容</a> 
     </div>
     <div>
         <h4  >【前后效果图对比】</h4>
