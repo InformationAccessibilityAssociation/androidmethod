@@ -8,8 +8,6 @@
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/jquery.zclip.min.js"></script>
 <script type="text/javascript">
-
-
 $(function(){ 
     $('#copy_input3').zclip({ 
         path: 'js/ZeroClipboard.swf', 
@@ -44,15 +42,15 @@ $(function(){
 
 <!-- body begin -->
 <div class="body">
-    <h3  >让标准控件选中时朗读出选中状态，未选中不朗读选中状态</h3>
+    <h1 >让标准控件选中时朗读出选中状态，未选中不朗读选中状态</h1>
     <hr />
     <div>
-        <h4  >【问题描述】</h4>
+        <h2  >【问题描述】</h2>
         <hr />
         <p>一些产品中为了美观和其他原因使用没有选中状态的标准控件通过背景颜色的改变来表示选中状态，如使用按钮（<code>Button</code>），这样的控件屏幕阅读器无法朗读出其选中状态，这时候会给屏幕阅读器用户带来一些不便。此解决方案达到的效果是：当控件聚焦的时候，选中时朗读出选中状态，未选中时不朗读出选中状态（减少听选中状态的时间）。当选中状态改变的时候及时播报出选中状态的改变。</p><!--问题说明-->
     </div>
     <div>
-        <h4  >【问题代码】</h4>
+        <h2  >【问题代码】</h2>
         <hr />
         <p>下面的代码达到的效果是点击按钮会改变选中状态，用背景颜色是红色来代表已选中，背景颜色白色代表未选中。</p><p>
 现在屏幕阅读器不会朗读出选中状态，屏幕阅读器用户无法知道此控件的选中状态。</p><p>
@@ -93,12 +91,12 @@ public class MainActivity extends Activity
         <!--</textarea>--><br/>
     </div>
     <div>
-        <h4  >【问题解决方案描述】</h4>
+        <h2  >【问题解决方案描述】</h2>
         <hr />
         <p>首先利用<code>View.setAccessibilityDelegate()</code>方法（低于api14可以使用v4扩展包内的<code>ViewCompat.setAccessibilityDelegate()</code>方法）给标准控件添加无障碍代理（<code>View.AccessibilityDelegate</code>），在代理中继承<code>onInitializeAccessibilityNodeInfo()</code>方法，在此方法中首先调用父类的实现，然后给调用<code>AccessibilityNodeInfo</code>的<code>setSelected()</code>方法设置选中状态，调用此方法设置的选中状态TalkBack朗读的时候是：当选中的时候会朗读出选中状态，未选中的时候不会朗读出选中状态。在点击事件中利用<code>View</code>的<code>announceForAccessibility()</code>方法发送一个通知，通知的内容是选中状态，如：“已选中”。此方法需api16才可用。在低于api16可以采用<code>AccessibilityManager</code>发送此事件的方法来播报（具体请参见代码）。</p>
     </div>
     <div>
-        <h4  >【解决方案】</h4>
+        <h2  >【解决方案】</h2>
         <hr />
 		<p>下面的代码达到的效果是：当聚焦按钮的时候，如果控件未选中（也就是背景是白色）的时候不会朗读出选中状态，当按钮选中（也就是背景是红色）的时候会朗读出选中状态，当点击按钮改变其选中状态会及时朗读出当前的选中状态。</p>
        <!-- <textarea rows="55" cols="120" aria-label="解决方案代码" id="code2">-->
@@ -154,7 +152,7 @@ public class MainActivity extends Activity
        <!-- </textarea>--><br/>
     </div>
     <div>
-        <h4  >【前后效果图对比】</h4>
+        <h2  >【前后效果图对比】</h2>
         <hr />
         <table>
             <tr>
@@ -166,15 +164,15 @@ public class MainActivity extends Activity
         </table>
     </div>
     <div>
-        <h4  >【扩展】</h4>
+        <h2  >【扩展】</h2>
         <hr />
-        <p>让标准控件选中时朗读出选中状态，未选中不朗读选中状态<a href="43_apk.apk">样例</a></p>
+        <p>让标准控件选中时朗读出选中状态，未选中不朗读选中状态<a href="../apk/43_apk.apk">样例</a></p>
     </div>
     <div>
-        <h4  >【更多】</h4>
+        <h2  >【更多】</h2>
         <hr />
         <p><a name="fujian1"></a>【附】 布局文件代码</p>
-		<textarea rows="12" cols="120" aria-label="解决方案代码" id="code3">
+		<textarea rows="12" cols="120" aria-label="code" id="code3">
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
@@ -188,7 +186,7 @@ public class MainActivity extends Activity
 		android:id="@+id/auto"		/>
 </LinearLayout>
         </textarea><br/>
-        <a href="#" id="copy_input3" class="copy">复制内容</a> 
+        <a href="#" id="copy_input3" class="copy">复制代码</a> 
 		
     </div>
 </div>
@@ -197,7 +195,7 @@ public class MainActivity extends Activity
 <hr/>
 <!-- footer begin -->
 <div class="footer">
-<p class="copyright">深圳市信息无障碍研究会 版权所有.Copyright © 2016 ARA. All 
+<p class="copyright">Copyright © 2016 深圳市信息无障碍研究会(ARA). All 
 Rights Reserved. <a href="http://www.miibeian.gov.cn/" target="_blank">粤ICP备10065437号</a> </p>
 <p class="copyright">地址：深圳市福田区雨田路1号富莲大厦一栋一层</p>
 </div>
